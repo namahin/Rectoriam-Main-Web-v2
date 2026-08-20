@@ -18,128 +18,13 @@
     <!-- Icons: Phosphor Icons (one family, regular weight only) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
 
-    <!-- Reveal animations only apply when JS can undo them; without JS the page stays visible. -->
-    <script>
-        document.documentElement.classList.add('js');
-    </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        page: 'rgb(var(--c-page) / <alpha-value>)',
-                        surface: 'rgb(var(--c-surface) / <alpha-value>)',
-                        line: 'rgb(var(--c-line) / <alpha-value>)',
-                        ink: 'rgb(var(--c-ink) / <alpha-value>)',
-                        muted: 'rgb(var(--c-muted) / <alpha-value>)',
-                        brand: 'rgb(var(--c-brand) / <alpha-value>)',
-                        brandHover: 'rgb(var(--c-brand-hover) / <alpha-value>)',
-                        brandSoft: 'rgb(var(--c-brand-soft) / <alpha-value>)',
-                        indigo: 'rgb(var(--c-indigo) / <alpha-value>)',
-                        indigoDeep: 'rgb(var(--c-indigo-deep) / <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-                    },
-                    borderRadius: {
-                        // SHAPE LOCK: panels = 'panel' (18px), icon tiles = 'tile' (12px),
-                        // every interactive control = rounded-full. No other radii on this page.
-                        panel: '18px',
-                        tile: '12px',
-                    },
-                    maxWidth: {
-                        shell: '1240px'
-                    },
-                }
-            }
-        }
-    </script>
 
-    <style>
-        /* ---- Token palette. Brand colours come from the Rectoriam logo: orange
-               rgb(242 89 3) is the single accent, indigo rgb(16 6 159) is the
-               structural brand colour. Neutrals are cooled toward the indigo.
-               The page is light only. ---- */
-        :root {
-            --c-page: 250 250 252;
-            --c-surface: 244 245 250;
-            --c-line: 224 226 238;
-            --c-ink: 12 10 45;
-            --c-muted: 84 88 112;
-            --c-brand: 242 89 3;
-            --c-brand-hover: 217 80 0;
-            --c-brand-soft: 255 240 232;
-            --c-indigo: 16 6 159;
-            --c-indigo-deep: 9 4 92;
-        }
+    <!-- Page behaviour: sets the 'js' flag before paint, extends the Tailwind
+         theme, then wires the page up on DOMContentLoaded. -->
+    <script src="js/app.js"></script>
 
-        html {
-            -webkit-text-size-adjust: 100%;
-            color-scheme: light;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-            background: rgb(var(--c-page));
-            color: rgb(var(--c-ink));
-            -webkit-font-smoothing: antialiased;
-        }
-
-        ::selection {
-            background: rgb(var(--c-brand) / .22);
-        }
-
-        a:focus-visible,
-        button:focus-visible {
-            outline: 2px solid rgb(var(--c-brand));
-            outline-offset: 3px;
-            border-radius: 4px;
-        }
-
-        .i {
-            font-size: 1em;
-            line-height: 1;
-            display: inline-block;
-        }
-
-        /* ---- Scroll reveal. Sequences each section in reading order as it enters,
-               so the eye lands on the headline before the detail. Driven by
-               IntersectionObserver, never a scroll listener. ---- */
-        .js [data-reveal] {
-            opacity: 0;
-            transform: translateY(18px);
-            transition: opacity .7s cubic-bezier(0.16, 1, 0.3, 1),
-                transform .7s cubic-bezier(0.16, 1, 0.3, 1);
-            transition-delay: var(--d, 0ms);
-        }
-
-        .js [data-reveal].is-in {
-            opacity: 1;
-            transform: none;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            [data-reveal] {
-                opacity: 1 !important;
-                transform: none !important;
-                transition: none !important;
-            }
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: .001ms !important;
-                transition-duration: .001ms !important;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body class="bg-page text-ink">
@@ -494,55 +379,6 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        // Scroll reveal via IntersectionObserver. Elements stay visible once shown.
-        (function () {
-            var nodes = document.querySelectorAll('[data-reveal]');
-            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-            if (reduce || !('IntersectionObserver' in window)) {
-                nodes.forEach(function (n) {
-                    n.classList.add('is-in');
-                });
-                return;
-            }
-
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-in');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, {
-                rootMargin: '0px 0px -80px 0px',
-                threshold: 0
-            });
-
-            nodes.forEach(function (n) {
-                io.observe(n);
-            });
-        })();
-
-        // Mobile navigation panel.
-        (function () {
-            var btn = document.getElementById('navToggle');
-            var panel = document.getElementById('navPanel');
-            if (!btn || !panel) return;
-
-            btn.addEventListener('click', function () {
-                var open = panel.hasAttribute('hidden');
-                if (open) {
-                    panel.removeAttribute('hidden');
-                } else {
-                    panel.setAttribute('hidden', '');
-                }
-                btn.setAttribute('aria-expanded', String(open));
-                btn.querySelector('i').className = 'ph i text-xl ' + (open ? 'ph-x' : 'ph-list');
-            });
-        })();
-    </script>
 </body>
 
 </html>
