@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account & Data Deletion - Rectoriam App</title>
+    <style>
+        /* Pro & Modern Design Variables */
+        :root {
+            --brand-primary: #f25900;
+            --brand-secondary: #cc4a00;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-main: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --ring-color: rgba(242, 89, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            line-height: 1.6;
+            margin: 0;
+            padding: 50px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .compliance-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-area {
+            padding: 40px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .app-branding {
+            display: inline-block;
+            background-color: #fffaf7;
+            color: var(--brand-primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border: 1px solid rgba(242, 89, 0, 0.2);
+        }
+
+        .header-area h1 {
+            color: var(--text-heading);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin: 0 0 12px 0;
+        }
+
+        .header-area p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin: 0;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        .form-area {
+            padding: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 28px;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-heading);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-group label span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: var(--text-heading);
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px var(--ring-color);
+        }
+
+        .option-box {
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+            position: relative;
+        }
+
+        .option-box:hover {
+            border-color: #cbd5e1;
+        }
+
+        .option-box.selected {
+            border-color: var(--brand-primary);
+            background-color: #fffaf7;
+        }
+
+        .radio-flex {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .radio-flex input[type="radio"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--brand-primary);
+            cursor: pointer;
+        }
+
+        .box-text h3 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+
+        .box-text p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .warning-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .selective-data-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            margin-top: 4px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--brand-primary);
+        }
+
+        .checkbox-text h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+
+        .checkbox-text p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .action-button {
+            width: 100%;
+            background-color: var(--text-heading);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .action-button:hover {
+            background-color: #000000;
+        }
+
+        .action-button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-note a {
+            color: var(--brand-primary);
+            text-decoration: none;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        .status-message {
+            display: none;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .status-message h3 {
+            color: #166534;
+            margin: 0 0 8px 0;
+            font-size: 18px;
+        }
+
+        .status-message p {
+            color: #15803d;
+            margin: 0;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="compliance-container">
+    <div class="header-area">
+        <div class="app-branding">Rectoriam App</div>
+        <h1>Data Privacy & Deletion Request</h1>
+        <p>In compliance with Google Play's Data Safety Policy, use this secure portal to request the removal of your Rectoriam account or manage specific operational records.</p>
+    </div>
+
+    <div class="form-area">
+        <form id="dataRequestForm">
+            <div class="input-group">
+                <label for="userEmail">Account Email Address</label>
+                <input type="email" id="userEmail" class="input-field" placeholder="name@example.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="uniqueId">Rectoriam User ID <span>(Optional but recommended for faster processing)</span></label>
+                <input type="text" id="uniqueId" class="input-field" placeholder="e.g., REC100022">
+            </div>
+
+            <div class="input-group">
+                <label>Select Request Type</label>
+
+                <!-- Full Deletion -->
+                <label class="option-box selected" id="boxFull">
+                    <div class="radio-flex">
+                        <input type="radio" name="requestType" value="full" checked onclick="toggleMode('full')">
+                        <div class="box-text">
+                            <span class="warning-badge">Irreversible Action</span>
+                            <h3>Permanent Account Closure</h3>
+                            <p>Completely erase your Rectoriam account. This removes all your personal details, active investments, wallet balances, and accumulated Rector Coins from our network.</p>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Partial Deletion -->
+                <label class="option-box" id="boxPartial">
+                    <div class="radio-flex">
+                        <input type="radio" name="requestType" value="partial" onclick="toggleMode('partial')">
+                        <div class="box-text">
+                            <h3>Selective Data Removal</h3>
+                            <p>Maintain your active Rectoriam account, but request the deletion of specific operational data or logs.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Checkboxes -->
+                    <div class="selective-data-list" id="partialList">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="dataCache" value="cache">
+                            <div class="checkbox-text">
+                                <h4>App Cache & Preferences</h4>
+                                <p>Clear your device-specific settings, UI themes, and cached media from the Rectoriam App.</p>
+                            </div>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="dataHistory" value="history">
+                            <div class="checkbox-text">
+                                <h4>Activity & Transaction Logs</h4>
+                                <p>Remove visual records of past P2P transfers and completed investment cycles. (Subject to standard financial retention policies).</p>
+                            </div>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="dataKyc" value="kyc">
+                            <div class="checkbox-text">
+                                <h4>Identity Documents (KYC)</h4>
+                                <p>Delete previously uploaded verification files. Note: You will need to re-verify your identity for future withdrawals.</p>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <button type="submit" class="action-button" id="btnSubmit">Submit Request</button>
+
+            <div class="status-message" id="msgSuccess">
+                <h3>Request Received Successfully</h3>
+                <p>Your privacy is important to us. The Rectoriam compliance team will review your request and send a status update to your registered email within 3-5 business days.</p>
+            </div>
+
+            <p class="footer-note">
+                By submitting this form, you acknowledge Rectoriam's <a href="#">Privacy Policy</a>. For regulatory compliance and anti-fraud measures, we may retain certain transactional data as required by local laws, even after account deletion.
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleMode(mode) {
+        const fullBox = document.getElementById('boxFull');
+        const partialBox = document.getElementById('boxPartial');
+        const partialList = document.getElementById('partialList');
+        
+        if (mode === 'full') {
+            fullBox.classList.add('selected');
+            partialBox.classList.remove('selected');
+            partialList.style.display = 'none';
+        } else {
+            partialBox.classList.add('selected');
+            fullBox.classList.remove('selected');
+            partialList.style.display = 'block';
+        }
+    }
+
+    document.getElementById('dataRequestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validation for partial selection
+        const isPartial = document.querySelector('input[name="requestType"]:checked').value === 'partial';
+        if (isPartial) {
+            const cache = document.getElementById('dataCache').checked;
+            const history = document.getElementById('dataHistory').checked;
+            const kyc = document.getElementById('dataKyc').checked;
+            
+            if (!cache && !history && !kyc) {
+                alert('Please specify at least one type of data you wish to remove from your Rectoriam account.');
+                return;
+            }
+        }
+
+        // Form submission simulation
+        const btn = document.getElementById('btnSubmit');
+        btn.innerText = 'Authenticating & Submitting...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.style.display = 'none';
+            document.querySelector('.footer-note').style.display = 'none';
+            document.getElementById('msgSuccess').style.display = 'block';
+        }, 1500);
+    });
+</script>
+
+</body>
+</html>
