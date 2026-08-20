@@ -1,414 +1,623 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account & Data Deletion - Rectoriam App</title>
+    <meta name="color-scheme" content="light only">
+    <title>Account &amp; Data Deletion - Rectoriam App</title>
+    <link rel="icon" type="image/png" href="img/rectoriam-icon.png">
+
+    <!-- Type: Plus Jakarta Sans (display + body), IBM Plex Mono (structural labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons: Phosphor Icons (one family, regular weight only) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+
+    <!-- Reveal animations only apply when JS can undo them; without JS the page stays visible. -->
+    <script>
+        document.documentElement.classList.add('js');
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        page: 'rgb(var(--c-page) / <alpha-value>)',
+                        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+                        line: 'rgb(var(--c-line) / <alpha-value>)',
+                        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+                        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+                        brand: 'rgb(var(--c-brand) / <alpha-value>)',
+                        brandHover: 'rgb(var(--c-brand-hover) / <alpha-value>)',
+                        brandSoft: 'rgb(var(--c-brand-soft) / <alpha-value>)',
+                        indigo: 'rgb(var(--c-indigo) / <alpha-value>)',
+                        indigoDeep: 'rgb(var(--c-indigo-deep) / <alpha-value>)',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    borderRadius: {
+                        // SHAPE LOCK: panels = 'panel' (18px), icon tiles = 'tile' (12px),
+                        // every interactive control = rounded-full. No other radii on this page.
+                        panel: '18px',
+                        tile: '12px',
+                    },
+                    maxWidth: {
+                        shell: '1240px'
+                    },
+                }
+            }
+        }
+    </script>
+
     <style>
-        /* Pro & Modern Design Variables */
+        /* ---- Token palette. Brand colours come from the Rectoriam logo: orange
+               rgb(242 89 3) is the single accent, indigo rgb(16 6 159) is the
+               structural brand colour. Neutrals are cooled toward the indigo.
+               The page is light only. ---- */
         :root {
-            --brand-primary: #f25900;
-            --brand-secondary: #cc4a00;
-            --text-heading: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-            --bg-main: #f8fafc;
-            --bg-surface: #ffffff;
-            --border-color: #e2e8f0;
-            --ring-color: rgba(242, 89, 0, 0.15);
+            --c-page: 250 250 252;
+            --c-surface: 244 245 250;
+            --c-line: 224 226 238;
+            --c-ink: 12 10 45;
+            --c-muted: 84 88 112;
+            --c-brand: 242 89 3;
+            --c-brand-hover: 217 80 0;
+            --c-brand-soft: 255 240 232;
+            --c-indigo: 16 6 159;
+            --c-indigo-deep: 9 4 92;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            color-scheme: light;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-body);
-            line-height: 1.6;
-            margin: 0;
-            padding: 50px 20px;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: rgb(var(--c-page));
+            color: rgb(var(--c-ink));
             -webkit-font-smoothing: antialiased;
         }
 
-        .compliance-container {
-            max-width: 650px;
-            margin: 0 auto;
-            background: var(--bg-surface);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        ::selection {
+            background: rgb(var(--c-brand) / .22);
         }
 
-        .header-area {
-            padding: 40px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: center;
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid rgb(var(--c-brand));
+            outline-offset: 3px;
+            border-radius: 4px;
         }
 
-        .app-branding {
+        .i {
+            font-size: 1em;
+            line-height: 1;
             display: inline-block;
-            background-color: #fffaf7;
-            color: var(--brand-primary);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            border: 1px solid rgba(242, 89, 0, 0.2);
         }
 
-        .header-area h1 {
-            color: var(--text-heading);
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin: 0 0 12px 0;
+        /* ---- Scroll reveal. Sequences each section in reading order as it enters,
+               so the eye lands on the headline before the detail. Driven by
+               IntersectionObserver, never a scroll listener. ---- */
+        .js [data-reveal] {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform .7s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: var(--d, 0ms);
         }
 
-        .header-area p {
-            color: var(--text-muted);
-            font-size: 15px;
-            margin: 0;
-            max-width: 90%;
-            margin: 0 auto;
+        .js [data-reveal].is-in {
+            opacity: 1;
+            transform: none;
         }
 
-        .form-area {
-            padding: 40px;
-        }
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
 
-        .input-group {
-            margin-bottom: 28px;
-        }
+            [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
 
-        .input-group label {
-            display: block;
-            color: var(--text-heading);
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            *,
+            *::before,
+            *::after {
+                animation-duration: .001ms !important;
+                transition-duration: .001ms !important;
+            }
         }
+    </style>
 
-        .input-group label span {
-            color: var(--text-muted);
-            font-weight: 400;
-            font-size: 13px;
-        }
-
-        .input-field {
+    <style>
+        /* ---- Request form. Controls reuse the page tokens: hairline borders,
+               brand focus ring, panel radius on the choice cards. ---- */
+        .field {
             width: 100%;
-            padding: 12px 16px;
-            font-size: 15px;
-            color: var(--text-heading);
-            background-color: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: all 0.2s;
+            border: 1px solid rgb(var(--c-line));
+            border-radius: 12px;
+            background: rgb(var(--c-page));
+            padding: .85rem 1rem;
+            font: inherit;
+            font-size: 1rem;
+            color: rgb(var(--c-ink));
+            transition: border-color .2s;
         }
 
-        .input-field:focus {
-            outline: none;
-            background-color: #ffffff;
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px var(--ring-color);
+        .field::placeholder {
+            color: rgb(var(--c-muted) / .6);
+        }
+
+        .field:focus {
+            outline: 2px solid rgb(var(--c-brand));
+            outline-offset: 2px;
+            border-color: transparent;
         }
 
         .option-box {
-            border: 1.5px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 16px;
+            display: block;
+            border: 1px solid rgb(var(--c-line));
+            border-radius: 18px;
+            background: rgb(var(--c-page));
+            padding: 1.35rem;
             cursor: pointer;
-            transition: border-color 0.2s, background-color 0.2s;
-            position: relative;
+            transition: border-color .2s, background-color .2s, box-shadow .2s;
         }
 
         .option-box:hover {
-            border-color: #cbd5e1;
+            border-color: rgb(var(--c-brand) / .45);
         }
 
         .option-box.selected {
-            border-color: var(--brand-primary);
-            background-color: #fffaf7;
+            border-color: rgb(var(--c-brand));
+            background: rgb(var(--c-brand-soft));
+            box-shadow: 0 14px 34px -22px rgb(var(--c-brand) / .9);
         }
 
-        .radio-flex {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .radio-flex input[type="radio"] {
-            margin-top: 4px;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--brand-primary);
+        .option-box input[type="radio"],
+        .checkbox-row input[type="checkbox"] {
+            accent-color: rgb(var(--c-brand));
+            height: 1.15rem;
+            width: 1.15rem;
+            flex-shrink: 0;
+            margin-top: .2rem;
             cursor: pointer;
         }
 
-        .box-text h3 {
-            margin: 0 0 6px 0;
-            font-size: 16px;
-            color: var(--text-heading);
-            font-weight: 600;
-        }
-
-        .box-text p {
-            margin: 0;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .warning-badge {
-            display: inline-block;
-            background: #fee2e2;
-            color: #b91c1c;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-        }
-
         .selective-data-list {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin-top: 1.35rem;
+            border-top: 1px solid rgb(var(--c-line));
+            padding-top: 1.35rem;
         }
 
         .checkbox-row {
             display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .checkbox-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .checkbox-row input[type="checkbox"] {
-            margin-top: 4px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--brand-primary);
-        }
-
-        .checkbox-text h4 {
-            margin: 0 0 4px 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-heading);
-        }
-
-        .checkbox-text p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .action-button {
-            width: 100%;
-            background-color: var(--text-heading);
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-
-        .action-button:hover {
-            background-color: #000000;
-        }
-
-        .action-button:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .footer-note {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer-note a {
-            color: var(--brand-primary);
-            text-decoration: none;
-        }
-
-        .footer-note a:hover {
-            text-decoration: underline;
-        }
-
-        .status-message {
-            display: none;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 24px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .status-message h3 {
-            color: #166534;
-            margin: 0 0 8px 0;
-            font-size: 18px;
-        }
-
-        .status-message p {
-            color: #15803d;
-            margin: 0;
-            font-size: 15px;
+            gap: .85rem;
+            padding: .7rem 0;
         }
     </style>
+
 </head>
-<body>
 
-<div class="compliance-container">
-    <div class="header-area">
-        <div class="app-branding">Rectoriam App</div>
-        <h1>Data Privacy & Deletion Request</h1>
-        <p>In compliance with Google Play's Data Safety Policy, use this secure portal to request the removal of your Rectoriam account or manage specific operational records.</p>
-    </div>
+<body class="bg-page text-ink">
 
-    <div class="form-area">
-        <form id="dataRequestForm">
-            <div class="input-group">
-                <label for="userEmail">Account Email Address</label>
-                <input type="email" id="userEmail" class="input-field" placeholder="name@example.com" required>
+    <!-- ============ NAVIGATION ============ -->
+    <nav class="fixed inset-x-0 top-0 z-50 h-[72px] bg-page/85 backdrop-blur-xl border-b border-line">
+        <div class="max-w-shell mx-auto h-full px-4 sm:px-6 lg:px-8">
+            <div class="flex h-full items-center justify-between gap-4">
+
+                <a href="index.html" class="flex-shrink-0 flex items-center" aria-label="Rectoriam home">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 35" fill="currentColor"
+                        class="w-32 sm:w-40 md:w-44">
+                        <path
+                            d="M25.7957 6.50352C25.7985 8.0903 25.2176 9.62269 24.1637 10.8089L0 34.9726V26.1871L12.5493 13.6448L15.0654 16.1609L15.6612 13.0158L17.0294 5.80983L6.67826 7.77382L9.19439 10.2882L6.46858 13.0158L0.00349805 19.4809V5.81682C0.00396138 4.27395 0.617195 2.79442 1.70834 1.7036C2.79948 0.612788 4.27919 -6.95686e-08 5.82207 0H19.2922C21.0178 0.00138879 22.6723 0.687631 23.8924 1.90801C25.1124 3.12839 25.7982 4.78311 25.7992 6.50875"
+                            fill="#FA4C03"></path>
+                        <mask id="mask0_351_2682_nav" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0"
+                            y="19" width="30" height="16">
+                            <path d="M0 34.9725H29.3567L15.7661 19.2083L0 34.9725Z" fill="white"></path>
+                        </mask>
+                        <g mask="url(#mask0_351_2682_nav)">
+                            <path d="M14.6791 4.52826L-7.88184 27.0892L14.6791 49.6502L37.2401 27.0892L14.6791 4.52826Z"
+                                fill="url(#paint0_linear_351_2682_nav)"></path>
+                        </g>
+                        <path
+                            d="M46.9243 21.9218C48.165 21.4029 49.225 20.5295 49.9716 19.4109C50.6869 18.3194 51.0445 17.0182 51.0445 15.5074C51.0445 13.2044 50.2611 11.3989 48.6943 10.0907C47.1276 8.78254 44.9312 8.12963 42.1052 8.13196H33.4263V28.4533H38.1283V22.7937H42.2205C42.2957 22.7937 42.3673 22.7937 42.4407 22.7937L46.3424 28.4585H51.4219L46.8789 21.9445L46.9208 21.927M45.2067 12.9004C45.9231 13.5201 46.2813 14.3909 46.2813 15.5126C46.2813 16.6158 45.9231 17.4819 45.2067 18.1109C44.4903 18.7399 43.4069 19.0545 41.9567 19.0545H38.1248V11.9656H41.9619C43.4134 11.9656 44.4967 12.2754 45.2119 12.8952"
+                            fill="#10069F"></path>
+                        <path
+                            d="M94.261 25.0862C93.9997 25.1002 93.7383 25.0597 93.4935 24.9674C93.2486 24.875 93.0257 24.7328 92.8387 24.5498C92.4892 24.2003 92.3145 23.6761 92.3145 23.0244V16.3199H96.204V12.8375H92.3145V9.38306H87.7854V12.8375H85.3759V16.3199H87.7854V23.0803C87.7854 24.9371 88.2986 26.335 89.3248 27.2738C90.3511 28.2127 91.7827 28.6822 93.6197 28.6822C94.3 28.6841 94.978 28.6014 95.6379 28.4358C96.235 28.2938 96.8007 28.0426 97.3066 27.6949L96.0834 24.5026C95.5571 24.8966 94.913 25.101 94.2557 25.0827"
+                            fill="#10069F"></path>
+                        <path
+                            d="M120.293 14.8888V12.8375H115.968V28.4533H120.497V21.0796C120.497 19.5909 120.879 18.493 121.643 17.7859C122.407 17.0788 123.409 16.7259 124.647 16.727C124.822 16.727 124.986 16.727 125.14 16.741C125.293 16.755 125.47 16.7655 125.664 16.7847V12.6051C124.193 12.6051 122.944 12.8905 121.919 13.4613C121.279 13.812 120.723 14.2994 120.293 14.8888Z"
+                            fill="#10069F"></path>
+                        <path
+                            d="M148.548 14.2878C147.232 13.166 145.385 12.6051 143.006 12.6051C141.77 12.6048 140.539 12.7705 139.347 13.0978C138.249 13.3829 137.208 13.8558 136.272 14.4957L137.897 17.6583C138.51 17.1867 139.203 16.8282 139.943 16.5995C140.732 16.3403 141.558 16.2082 142.389 16.2081C143.606 16.2081 144.511 16.4789 145.103 17.0206C145.694 17.5622 145.99 18.3194 145.989 19.2921H142.389C140.801 19.2921 139.514 19.4901 138.527 19.8862C137.541 20.2822 136.82 20.8291 136.366 21.5269C135.917 22.256 135.68 23.0961 135.683 23.9524C135.685 24.8088 135.927 25.6475 136.38 26.374C136.875 27.1165 137.569 27.705 138.382 28.0724C139.255 28.4882 140.3 28.6962 141.517 28.6962C142.891 28.6962 144.013 28.4346 144.884 27.9116C145.461 27.5711 145.942 27.0902 146.282 26.5138V28.462H150.519V19.5507C150.519 17.1708 149.861 15.4194 148.545 14.2965M144.704 25.1002C144.089 25.4623 143.386 25.6479 142.672 25.6366C141.879 25.6366 141.255 25.4677 140.801 25.1299C140.582 24.9743 140.405 24.767 140.286 24.5264C140.167 24.2859 140.109 24.0196 140.118 23.7513C140.113 23.5028 140.165 23.2565 140.268 23.0304C140.371 22.8043 140.523 22.6041 140.713 22.4443C141.111 22.0948 141.841 21.9201 142.905 21.9201H146.011V23.5171C145.766 24.1743 145.306 24.7288 144.704 25.0897"
+                            fill="#10069F"></path>
+                        <path
+                            d="M179.177 15.6088C178.672 14.6355 177.879 13.8421 176.906 13.3373C175.883 12.8284 174.752 12.5742 173.61 12.5965C172.214 12.5706 170.84 12.9434 169.649 13.6711C169.014 14.0611 168.452 14.5597 167.989 15.1441C167.633 14.5629 167.157 14.0652 166.591 13.685C165.479 12.9477 164.167 12.5679 162.833 12.5965C161.644 12.5752 160.469 12.8598 159.422 13.4229C158.855 13.7384 158.349 14.1526 157.928 14.6461V12.8376H153.616V28.4534H158.143V20.6167C158.143 19.6848 158.288 18.92 158.578 18.3224C158.837 17.7578 159.265 17.2868 159.801 16.9735C160.341 16.669 160.952 16.5134 161.571 16.5227C162.519 16.5227 163.25 16.8226 163.764 17.4226C164.278 18.0225 164.534 18.9544 164.533 20.2183V28.4621H169.06V20.6167C169.06 19.6848 169.205 18.92 169.495 18.3224C169.755 17.7578 170.182 17.2868 170.718 16.9735C171.258 16.669 171.869 16.5134 172.488 16.5227C173.437 16.5227 174.172 16.8226 174.695 17.4226C175.218 18.0225 175.479 18.9544 175.478 20.2183V28.4621H180V19.5141C180 17.9275 179.724 16.6258 179.172 15.6088"
+                            fill="#10069F"></path>
+                        <path
+                            d="M105.694 12.4409C104.104 12.4409 102.55 12.9123 101.228 13.7955C99.9064 14.6787 98.8762 15.934 98.2678 17.4027C97.6595 18.8714 97.5003 20.4875 97.8105 22.0467C98.1206 23.6058 98.8861 25.038 100.01 26.1621C101.134 27.2862 102.566 28.0517 104.126 28.3618C105.685 28.6719 107.301 28.5128 108.77 27.9044C110.238 27.2961 111.494 26.2659 112.377 24.9441C113.26 23.6223 113.731 22.0683 113.731 20.4786C113.731 18.3469 112.885 16.3024 111.377 14.7951C109.87 13.2877 107.825 12.4409 105.694 12.4409ZM105.694 25.0513C104.79 25.0513 103.906 24.7832 103.154 24.281C102.402 23.7787 101.817 23.0648 101.471 22.2296C101.125 21.3943 101.034 20.4753 101.211 19.5886C101.387 18.7019 101.822 17.8874 102.461 17.2482C103.101 16.6089 103.915 16.1735 104.802 15.9972C105.689 15.8208 106.608 15.9113 107.443 16.2573C108.278 16.6033 108.992 17.1891 109.494 17.9408C109.997 18.6925 110.265 19.5763 110.265 20.4803C110.263 21.6922 109.781 22.854 108.924 23.711C108.067 24.5679 106.906 25.0499 105.694 25.0513Z"
+                            fill="#10069F"></path>
+                        <path
+                            d="M60.2406 25.2173C59.4854 25.2171 58.742 25.0294 58.0772 24.6711C57.4123 24.3127 56.8469 23.795 56.4315 23.1642L61.483 21.8869L64.7907 21.0534L68.2643 20.1798C68.1583 18.0802 67.234 16.1058 65.6895 14.6797C64.1449 13.2536 62.1031 12.4893 60.0018 12.5508C57.9005 12.6123 55.9069 13.4946 54.4484 15.0086C52.9899 16.5225 52.1825 18.5477 52.1995 20.6498C52.1995 20.7791 52.203 20.9067 52.21 21.0325C52.2832 22.5886 52.8071 24.0898 53.7178 25.3537C54.6286 26.6175 55.887 27.5894 57.34 28.1513C58.7929 28.7131 60.3778 28.8406 61.9019 28.5182C63.426 28.1959 64.8236 27.4376 65.9247 26.3356L63.4697 23.8789C63.0463 24.3041 62.5431 24.6416 61.989 24.8719C61.4349 25.1022 60.8407 25.2207 60.2406 25.2208M57.0099 17.4173C57.4832 16.9435 58.055 16.5796 58.6847 16.3515C59.3144 16.1234 59.9866 16.0366 60.6535 16.0973C61.3205 16.158 61.966 16.3647 62.5442 16.7027C63.1223 17.0408 63.6191 17.5018 63.9991 18.0533L58.9319 19.3358L55.7029 20.1518C55.816 19.1174 56.279 18.1527 57.0151 17.4173"
+                            fill="#10069F"></path>
+                        <path
+                            d="M81.3168 22.8461L84.3606 24.5183C83.5026 26.0841 82.1476 27.3197 80.5094 28.03C78.8713 28.7403 77.0432 28.8849 75.3138 28.441C73.5843 27.9971 72.0519 26.99 70.9583 25.5786C69.8647 24.1672 69.2722 22.4318 69.2743 20.6463C69.2746 20.3198 69.2944 19.9936 69.3337 19.6695C69.4566 18.6528 69.774 17.6693 70.2685 16.7725C70.385 16.5546 70.516 16.3415 70.6617 16.1329C71.4337 14.9931 72.4856 14.0706 73.7165 13.454C74.9474 12.8373 76.3161 12.5472 77.6913 12.6114C79.0666 12.6756 80.4022 13.092 81.5704 13.8206C82.7385 14.5492 83.6999 15.5656 84.3624 16.7725L81.3186 18.4464C80.9251 17.7284 80.3458 17.1294 79.6414 16.7122C78.937 16.2949 78.1333 16.0748 77.3146 16.0748C76.4958 16.0748 75.6922 16.2949 74.9877 16.7122C74.2833 17.1294 73.704 17.7284 73.3106 18.4464C73.2636 18.5279 73.221 18.6119 73.183 18.698C72.8929 19.3064 72.7436 19.9723 72.7462 20.6463C72.7454 21.6607 73.0823 22.6465 73.7037 23.4482C74.3252 24.2499 75.1958 24.822 76.1784 25.0741C77.1609 25.3263 78.1994 25.2442 79.1302 24.8408C80.0609 24.4373 80.8308 23.7356 81.3186 22.8461"
+                            fill="#10069F"></path>
+                        <path d="M132.98 12.8375H128.453V28.4533H132.98V12.8375Z" fill="#10069F"></path>
+                        <path
+                            d="M132.982 6.28162C131.781 6.28162 130.629 6.7586 129.78 7.60763C128.931 8.45667 128.454 9.60821 128.454 10.8089H132.983L132.982 6.28162Z"
+                            fill="#FA4C03"></path>
+                        <defs>
+                            <linearGradient id="paint0_linear_351_2682_nav" x1="6.64824" y1="16.9224" x2="16.0841"
+                                y2="26.3583" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#DA2922"></stop>
+                                <stop offset="1" stop-color="#FA4C03"></stop>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </a>
+
+                <div class="hidden md:flex flex-1 justify-center items-center gap-7 lg:gap-9">
+                    <a href="index.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">Home</a>
+                    <a href="about-us.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">About
+                        Us</a>
+                    <a href="privacy-policy.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">Privacy
+                        Policy</a>
+                    <a href="terms-conditions.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">Terms</a>
+                </div>
+
+                <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+                    <a href="https://app.rectoriam.com/login"
+                        class="hidden sm:inline-flex items-center px-3 py-2 text-[15px] font-semibold text-muted hover:text-ink transition-colors duration-200">Login</a>
+                    <a href="https://app.rectoriam.com/sign-up"
+                        class="inline-flex items-center rounded-full bg-brand px-6 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-brandHover active:translate-y-px">SignUp</a>
+                    <button type="button" id="navToggle" aria-label="Menu" aria-expanded="false"
+                        aria-controls="navPanel"
+                        class="md:hidden ml-1 grid h-10 w-10 place-items-center rounded-full border border-line text-ink transition-colors duration-200 hover:bg-surface">
+                        <i class="ph ph-list i text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile panel: same four destinations, no new labels. -->
+        <div id="navPanel" hidden class="md:hidden border-t border-line bg-page/95 backdrop-blur-xl">
+            <div class="max-w-shell mx-auto px-4 sm:px-6 py-4 flex flex-col">
+                <a href="index.html" class="py-3 text-base font-medium text-muted">Home</a>
+                <a href="about-us.html" class="py-3 text-base font-medium text-muted border-t border-line">About Us</a>
+                <a href="privacy-policy.html" class="py-3 text-base font-medium text-muted border-t border-line">Privacy
+                    Policy</a>
+                <a href="terms-conditions.html"
+                    class="py-3 text-base font-medium text-muted border-t border-line">Terms</a>
+                <a href="https://app.rectoriam.com/login"
+                    class="py-3 text-base font-medium text-muted border-t border-line sm:hidden">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+
+        <!-- ============ PAGE HEADER :: centred, matches the home hero ============ -->
+        <section
+            class="relative overflow-hidden border-b border-line pt-[calc(72px+3rem)] pb-14 lg:pt-[calc(72px+4rem)] lg:pb-16">
+            <div aria-hidden="true"
+                class="pointer-events-none absolute -top-52 right-[-8%] h-[640px] w-[640px] rounded-full bg-brand/10 blur-[130px]">
             </div>
 
-            <div class="input-group">
-                <label for="uniqueId">Rectoriam User ID <span>(Optional but recommended for faster processing)</span></label>
-                <input type="text" id="uniqueId" class="input-field" placeholder="e.g., REC100022">
+            <div class="relative max-w-shell mx-auto px-4 text-center sm:px-6 lg:px-8">
+                <div data-reveal
+                    class="inline-flex items-center gap-2.5 rounded-full border border-brand/30 bg-brandSoft px-4 py-2 text-[13px] font-semibold leading-snug text-ink">
+                    <i class="ph ph-shield-check i mt-px text-base text-brand" aria-hidden="true"></i>
+                    Rectoriam App
+                </div>
+
+                <h1 data-reveal style="--d:70ms"
+                    class="mx-auto mt-6 max-w-[18ch] text-[2.15rem] font-extrabold leading-[1.1] tracking-[-0.03em] sm:max-w-none sm:text-[2.5rem] md:text-[2.875rem] lg:text-[3.375rem]">
+                    Data Privacy &amp; <span class="text-brand">Deletion Request</span>
+                </h1>
+
+                <p data-reveal style="--d:140ms"
+                    class="mx-auto mt-6 max-w-2xl text-[1.0625rem] leading-[1.8] text-muted lg:text-[1.125rem]">
+                    In compliance with Google Play's Data Safety Policy, use this secure portal to request the removal
+                    of your Rectoriam account or manage specific operational records.
+                </p>
             </div>
+        </section>
 
-            <div class="input-group">
-                <label>Select Request Type</label>
+        <!-- ============ REQUEST FORM ============ -->
+        <section class="py-16 lg:py-20">
+            <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                <form id="dataRequestForm" data-reveal class="rounded-panel border border-line bg-surface p-6 sm:p-9">
 
-                <!-- Full Deletion -->
-                <label class="option-box selected" id="boxFull">
-                    <div class="radio-flex">
-                        <input type="radio" name="requestType" value="full" checked onclick="toggleMode('full')">
-                        <div class="box-text">
-                            <span class="warning-badge">Irreversible Action</span>
-                            <h3>Permanent Account Closure</h3>
-                            <p>Completely erase your Rectoriam account. This removes all your personal details, active investments, wallet balances, and accumulated Rector Coins from our network.</p>
+                    <div>
+                        <label for="userEmail" class="block text-[15px] font-semibold text-ink">Account Email
+                            Address</label>
+                        <input type="email" id="userEmail" class="field mt-2.5" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="mt-7">
+                        <label for="uniqueId" class="block text-[15px] font-semibold text-ink">Rectoriam User ID
+                            <span class="font-medium text-muted">(Optional but recommended for faster
+                                processing)</span></label>
+                        <input type="text" id="uniqueId" class="field mt-2.5" placeholder="e.g., REC100022">
+                    </div>
+
+                    <div class="mt-9">
+                        <span class="block text-[15px] font-semibold text-ink">Select Request Type</span>
+
+                        <div class="mt-4 grid gap-4">
+                            <!-- Full deletion -->
+                            <label class="option-box selected" id="boxFull">
+                                <div class="flex gap-4">
+                                    <input type="radio" name="requestType" value="full" checked
+                                        onclick="toggleMode('full')">
+                                    <div>
+                                        <span
+                                            class="inline-flex items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white">
+                                            <i class="ph ph-warning i text-xs" aria-hidden="true"></i>Irreversible
+                                            Action
+                                        </span>
+                                        <h3 class="mt-3 text-lg font-bold tracking-[-0.01em]">Permanent Account Closure
+                                        </h3>
+                                        <p class="mt-2 text-[15px] leading-[1.75] text-muted">Completely erase your
+                                            Rectoriam account. This removes all your personal details, active
+                                            investments, wallet balances, and accumulated Rector Coins from our network.
+                                        </p>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Selective removal -->
+                            <label class="option-box" id="boxPartial">
+                                <div class="flex gap-4">
+                                    <input type="radio" name="requestType" value="partial"
+                                        onclick="toggleMode('partial')">
+                                    <div>
+                                        <h3 class="text-lg font-bold tracking-[-0.01em]">Selective Data Removal</h3>
+                                        <p class="mt-2 text-[15px] leading-[1.75] text-muted">Maintain your active
+                                            Rectoriam account, but request the deletion of specific operational data or
+                                            logs.</p>
+                                    </div>
+                                </div>
+
+                                <div class="selective-data-list" id="partialList">
+                                    <div class="checkbox-row">
+                                        <input type="checkbox" id="dataCache" value="cache">
+                                        <div>
+                                            <strong class="block text-[15px] font-semibold text-ink">App Cache &amp;
+                                                Preferences</strong>
+                                            <span class="mt-1 block text-[14px] leading-[1.7] text-muted">Clear your
+                                                device-specific settings, UI themes, and cached media from the
+                                                Rectoriam App.</span>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-row">
+                                        <input type="checkbox" id="dataHistory" value="history">
+                                        <div>
+                                            <strong class="block text-[15px] font-semibold text-ink">Activity &amp;
+                                                Transaction Logs</strong>
+                                            <span class="mt-1 block text-[14px] leading-[1.7] text-muted">Remove visual
+                                                records of past P2P transfers and completed investment cycles. (Subject
+                                                to standard financial retention policies).</span>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-row">
+                                        <input type="checkbox" id="dataKyc" value="kyc">
+                                        <div>
+                                            <strong class="block text-[15px] font-semibold text-ink">Identity Documents
+                                                (KYC)</strong>
+                                            <span class="mt-1 block text-[14px] leading-[1.7] text-muted">Delete
+                                                previously uploaded verification files. Note: You will need to re-verify
+                                                your identity for future withdrawals.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
                         </div>
                     </div>
-                </label>
 
-                <!-- Partial Deletion -->
-                <label class="option-box" id="boxPartial">
-                    <div class="radio-flex">
-                        <input type="radio" name="requestType" value="partial" onclick="toggleMode('partial')">
-                        <div class="box-text">
-                            <h3>Selective Data Removal</h3>
-                            <p>Maintain your active Rectoriam account, but request the deletion of specific operational data or logs.</p>
+                    <button type="submit" id="btnSubmit"
+                        class="mt-8 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-brand px-8 py-4 text-lg font-bold text-white shadow-[0_14px_34px_-12px_rgb(var(--c-brand)/.65)] transition-colors duration-200 hover:bg-brandHover active:translate-y-px">
+                        <i class="ph ph-paper-plane-tilt i text-xl" aria-hidden="true"></i>Submit Request
+                    </button>
+
+                    <div id="msgSuccess" style="display:none"
+                        class="mt-8 flex gap-5 rounded-panel border border-brand/25 bg-brandSoft p-6 sm:p-7">
+                        <span class="grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-brand text-white">
+                            <i class="ph ph-check-circle i text-xl" aria-hidden="true"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-lg font-bold tracking-[-0.01em]">Request Received Successfully</h3>
+                            <p class="mt-2 text-[15px] leading-[1.75] text-muted">Your privacy is important to us. The
+                                Rectoriam compliance team will review your request and send a status update to your
+                                registered email within 3-5 business days.</p>
                         </div>
                     </div>
 
-                    <!-- Hidden Checkboxes -->
-                    <div class="selective-data-list" id="partialList">
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="dataCache" value="cache">
-                            <div class="checkbox-text">
-                                <h4>App Cache & Preferences</h4>
-                                <p>Clear your device-specific settings, UI themes, and cached media from the Rectoriam App.</p>
-                            </div>
-                        </div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="dataHistory" value="history">
-                            <div class="checkbox-text">
-                                <h4>Activity & Transaction Logs</h4>
-                                <p>Remove visual records of past P2P transfers and completed investment cycles. (Subject to standard financial retention policies).</p>
-                            </div>
-                        </div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="dataKyc" value="kyc">
-                            <div class="checkbox-text">
-                                <h4>Identity Documents (KYC)</h4>
-                                <p>Delete previously uploaded verification files. Note: You will need to re-verify your identity for future withdrawals.</p>
-                            </div>
-                        </div>
-                    </div>
-                </label>
+                    <p id="formNote" class="mt-7 border-t border-line pt-6 text-[14px] leading-[1.75] text-muted">
+                        By submitting this form, you acknowledge Rectoriam's
+                        <a href="privacy-policy.html" class="font-semibold text-brand hover:underline">Privacy
+                            Policy</a>. For regulatory compliance and anti-fraud measures, we may retain certain
+                        transactional data as required by local laws, even after account deletion.
+                    </p>
+                </form>
             </div>
+        </section>
 
-            <button type="submit" class="action-button" id="btnSubmit">Submit Request</button>
+    </main>
 
-            <div class="status-message" id="msgSuccess">
-                <h3>Request Received Successfully</h3>
-                <p>Your privacy is important to us. The Rectoriam compliance team will review your request and send a status update to your registered email within 3-5 business days.</p>
+    <!-- ============ FOOTER ============ -->
+    <footer class="border-t border-line bg-surface py-12">
+        <div
+            class="max-w-shell mx-auto flex flex-col items-center gap-6 px-4 sm:px-6 lg:flex-row lg:justify-between lg:px-8">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 35" fill="currentColor" class="w-36"
+                aria-hidden="true">
+                <path
+                    d="M25.7957 6.50352C25.7985 8.0903 25.2176 9.62269 24.1637 10.8089L0 34.9726V26.1871L12.5493 13.6448L15.0654 16.1609L15.6612 13.0158L17.0294 5.80983L6.67826 7.77382L9.19439 10.2882L6.46858 13.0158L0.00349805 19.4809V5.81682C0.00396138 4.27395 0.617195 2.79442 1.70834 1.7036C2.79948 0.612788 4.27919 -6.95686e-08 5.82207 0H19.2922C21.0178 0.00138879 22.6723 0.687631 23.8924 1.90801C25.1124 3.12839 25.7982 4.78311 25.7992 6.50875"
+                    fill="#FA4C03"></path>
+                <mask id="mask0_351_2682_foot" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="19"
+                    width="30" height="16">
+                    <path d="M0 34.9725H29.3567L15.7661 19.2083L0 34.9725Z" fill="white"></path>
+                </mask>
+                <g mask="url(#mask0_351_2682_foot)">
+                    <path d="M14.6791 4.52826L-7.88184 27.0892L14.6791 49.6502L37.2401 27.0892L14.6791 4.52826Z"
+                        fill="url(#paint0_linear_351_2682_foot)"></path>
+                </g>
+                <path
+                    d="M46.9243 21.9218C48.165 21.4029 49.225 20.5295 49.9716 19.4109C50.6869 18.3194 51.0445 17.0182 51.0445 15.5074C51.0445 13.2044 50.2611 11.3989 48.6943 10.0907C47.1276 8.78254 44.9312 8.12963 42.1052 8.13196H33.4263V28.4533H38.1283V22.7937H42.2205C42.2957 22.7937 42.3673 22.7937 42.4407 22.7937L46.3424 28.4585H51.4219L46.8789 21.9445L46.9208 21.927M45.2067 12.9004C45.9231 13.5201 46.2813 14.3909 46.2813 15.5126C46.2813 16.6158 45.9231 17.4819 45.2067 18.1109C44.4903 18.7399 43.4069 19.0545 41.9567 19.0545H38.1248V11.9656H41.9619C43.4134 11.9656 44.4967 12.2754 45.2119 12.8952"
+                    fill="#10069F"></path>
+                <path
+                    d="M94.261 25.0862C93.9997 25.1002 93.7383 25.0597 93.4935 24.9674C93.2486 24.875 93.0257 24.7328 92.8387 24.5498C92.4892 24.2003 92.3145 23.6761 92.3145 23.0244V16.3199H96.204V12.8375H92.3145V9.38306H87.7854V12.8375H85.3759V16.3199H87.7854V23.0803C87.7854 24.9371 88.2986 26.335 89.3248 27.2738C90.3511 28.2127 91.7827 28.6822 93.6197 28.6822C94.3 28.6841 94.978 28.6014 95.6379 28.4358C96.235 28.2938 96.8007 28.0426 97.3066 27.6949L96.0834 24.5026C95.5571 24.8966 94.913 25.101 94.2557 25.0827"
+                    fill="#10069F"></path>
+                <path
+                    d="M120.293 14.8888V12.8375H115.968V28.4533H120.497V21.0796C120.497 19.5909 120.879 18.493 121.643 17.7859C122.407 17.0788 123.409 16.7259 124.647 16.727C124.822 16.727 124.986 16.727 125.14 16.741C125.293 16.755 125.47 16.7655 125.664 16.7847V12.6051C124.193 12.6051 122.944 12.8905 121.919 13.4613C121.279 13.812 120.723 14.2994 120.293 14.8888Z"
+                    fill="#10069F"></path>
+                <path
+                    d="M148.548 14.2878C147.232 13.166 145.385 12.6051 143.006 12.6051C141.77 12.6048 140.539 12.7705 139.347 13.0978C138.249 13.3829 137.208 13.8558 136.272 14.4957L137.897 17.6583C138.51 17.1867 139.203 16.8282 139.943 16.5995C140.732 16.3403 141.558 16.2082 142.389 16.2081C143.606 16.2081 144.511 16.4789 145.103 17.0206C145.694 17.5622 145.99 18.3194 145.989 19.2921H142.389C140.801 19.2921 139.514 19.4901 138.527 19.8862C137.541 20.2822 136.82 20.8291 136.366 21.5269C135.917 22.256 135.68 23.0961 135.683 23.9524C135.685 24.8088 135.927 25.6475 136.38 26.374C136.875 27.1165 137.569 27.705 138.382 28.0724C139.255 28.4882 140.3 28.6962 141.517 28.6962C142.891 28.6962 144.013 28.4346 144.884 27.9116C145.461 27.5711 145.942 27.0902 146.282 26.5138V28.462H150.519V19.5507C150.519 17.1708 149.861 15.4194 148.545 14.2965M144.704 25.1002C144.089 25.4623 143.386 25.6479 142.672 25.6366C141.879 25.6366 141.255 25.4677 140.801 25.1299C140.582 24.9743 140.405 24.767 140.286 24.5264C140.167 24.2859 140.109 24.0196 140.118 23.7513C140.113 23.5028 140.165 23.2565 140.268 23.0304C140.371 22.8043 140.523 22.6041 140.713 22.4443C141.111 22.0948 141.841 21.9201 142.905 21.9201H146.011V23.5171C145.766 24.1743 145.306 24.7288 144.704 25.0897"
+                    fill="#10069F"></path>
+                <path
+                    d="M179.177 15.6088C178.672 14.6355 177.879 13.8421 176.906 13.3373C175.883 12.8284 174.752 12.5742 173.61 12.5965C172.214 12.5706 170.84 12.9434 169.649 13.6711C169.014 14.0611 168.452 14.5597 167.989 15.1441C167.633 14.5629 167.157 14.0652 166.591 13.685C165.479 12.9477 164.167 12.5679 162.833 12.5965C161.644 12.5752 160.469 12.8598 159.422 13.4229C158.855 13.7384 158.349 14.1526 157.928 14.6461V12.8376H153.616V28.4534H158.143V20.6167C158.143 19.6848 158.288 18.92 158.578 18.3224C158.837 17.7578 159.265 17.2868 159.801 16.9735C160.341 16.669 160.952 16.5134 161.571 16.5227C162.519 16.5227 163.25 16.8226 163.764 17.4226C164.278 18.0225 164.534 18.9544 164.533 20.2183V28.4621H169.06V20.6167C169.06 19.6848 169.205 18.92 169.495 18.3224C169.755 17.7578 170.182 17.2868 170.718 16.9735C171.258 16.669 171.869 16.5134 172.488 16.5227C173.437 16.5227 174.172 16.8226 174.695 17.4226C175.218 18.0225 175.479 18.9544 175.478 20.2183V28.4621H180V19.5141C180 17.9275 179.724 16.6258 179.172 15.6088"
+                    fill="#10069F"></path>
+                <path
+                    d="M105.694 12.4409C104.104 12.4409 102.55 12.9123 101.228 13.7955C99.9064 14.6787 98.8762 15.934 98.2678 17.4027C97.6595 18.8714 97.5003 20.4875 97.8105 22.0467C98.1206 23.6058 98.8861 25.038 100.01 26.1621C101.134 27.2862 102.566 28.0517 104.126 28.3618C105.685 28.6719 107.301 28.5128 108.77 27.9044C110.238 27.2961 111.494 26.2659 112.377 24.9441C113.26 23.6223 113.731 22.0683 113.731 20.4786C113.731 18.3469 112.885 16.3024 111.377 14.7951C109.87 13.2877 107.825 12.4409 105.694 12.4409ZM105.694 25.0513C104.79 25.0513 103.906 24.7832 103.154 24.281C102.402 23.7787 101.817 23.0648 101.471 22.2296C101.125 21.3943 101.034 20.4753 101.211 19.5886C101.387 18.7019 101.822 17.8874 102.461 17.2482C103.101 16.6089 103.915 16.1735 104.802 15.9972C105.689 15.8208 106.608 15.9113 107.443 16.2573C108.278 16.6033 108.992 17.1891 109.494 17.9408C109.997 18.6925 110.265 19.5763 110.265 20.4803C110.263 21.6922 109.781 22.854 108.924 23.711C108.067 24.5679 106.906 25.0499 105.694 25.0513Z"
+                    fill="#10069F"></path>
+                <path
+                    d="M60.2406 25.2173C59.4854 25.2171 58.742 25.0294 58.0772 24.6711C57.4123 24.3127 56.8469 23.795 56.4315 23.1642L61.483 21.8869L64.7907 21.0534L68.2643 20.1798C68.1583 18.0802 67.234 16.1058 65.6895 14.6797C64.1449 13.2536 62.1031 12.4893 60.0018 12.5508C57.9005 12.6123 55.9069 13.4946 54.4484 15.0086C52.9899 16.5225 52.1825 18.5477 52.1995 20.6498C52.1995 20.7791 52.203 20.9067 52.21 21.0325C52.2832 22.5886 52.8071 24.0898 53.7178 25.3537C54.6286 26.6175 55.887 27.5894 57.34 28.1513C58.7929 28.7131 60.3778 28.8406 61.9019 28.5182C63.426 28.1959 64.8236 27.4376 65.9247 26.3356L63.4697 23.8789C63.0463 24.3041 62.5431 24.6416 61.989 24.8719C61.4349 25.1022 60.8407 25.2207 60.2406 25.2208M57.0099 17.4173C57.4832 16.9435 58.055 16.5796 58.6847 16.3515C59.3144 16.1234 59.9866 16.0366 60.6535 16.0973C61.3205 16.158 61.966 16.3647 62.5442 16.7027C63.1223 17.0408 63.6191 17.5018 63.9991 18.0533L58.9319 19.3358L55.7029 20.1518C55.816 19.1174 56.279 18.1527 57.0151 17.4173"
+                    fill="#10069F"></path>
+                <path
+                    d="M81.3168 22.8461L84.3606 24.5183C83.5026 26.0841 82.1476 27.3197 80.5094 28.03C78.8713 28.7403 77.0432 28.8849 75.3138 28.441C73.5843 27.9971 72.0519 26.99 70.9583 25.5786C69.8647 24.1672 69.2722 22.4318 69.2743 20.6463C69.2746 20.3198 69.2944 19.9936 69.3337 19.6695C69.4566 18.6528 69.774 17.6693 70.2685 16.7725C70.385 16.5546 70.516 16.3415 70.6617 16.1329C71.4337 14.9931 72.4856 14.0706 73.7165 13.454C74.9474 12.8373 76.3161 12.5472 77.6913 12.6114C79.0666 12.6756 80.4022 13.092 81.5704 13.8206C82.7385 14.5492 83.6999 15.5656 84.3624 16.7725L81.3186 18.4464C80.9251 17.7284 80.3458 17.1294 79.6414 16.7122C78.937 16.2949 78.1333 16.0748 77.3146 16.0748C76.4958 16.0748 75.6922 16.2949 74.9877 16.7122C74.2833 17.1294 73.704 17.7284 73.3106 18.4464C73.2636 18.5279 73.221 18.6119 73.183 18.698C72.8929 19.3064 72.7436 19.9723 72.7462 20.6463C72.7454 21.6607 73.0823 22.6465 73.7037 23.4482C74.3252 24.2499 75.1958 24.822 76.1784 25.0741C77.1609 25.3263 78.1994 25.2442 79.1302 24.8408C80.0609 24.4373 80.8308 23.7356 81.3186 22.8461"
+                    fill="#10069F"></path>
+                <path d="M132.98 12.8375H128.453V28.4533H132.98V12.8375Z" fill="#10069F"></path>
+                <path
+                    d="M132.982 6.28162C131.781 6.28162 130.629 6.7586 129.78 7.60763C128.931 8.45667 128.454 9.60821 128.454 10.8089H132.983L132.982 6.28162Z"
+                    fill="#FA4C03"></path>
+                <defs>
+                    <linearGradient id="paint0_linear_351_2682_foot" x1="6.64824" y1="16.9224" x2="16.0841" y2="26.3583"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#DA2922"></stop>
+                        <stop offset="1" stop-color="#FA4C03"></stop>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <div class="text-center text-sm font-medium text-muted lg:text-right">
+                &copy; 2026 Rectoriam Inc. Registered and operating under Canadian Jurisdiction.
             </div>
+        </div>
+    </footer>
 
-            <p class="footer-note">
-                By submitting this form, you acknowledge Rectoriam's <a href="#">Privacy Policy</a>. For regulatory compliance and anti-fraud measures, we may retain certain transactional data as required by local laws, even after account deletion.
-            </p>
-        </form>
-    </div>
-</div>
+    <script>
+        // Scroll reveal via IntersectionObserver. Elements stay visible once shown.
+        (function () {
+            var nodes = document.querySelectorAll('[data-reveal]');
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-<script>
-    function toggleMode(mode) {
-        const fullBox = document.getElementById('boxFull');
-        const partialBox = document.getElementById('boxPartial');
-        const partialList = document.getElementById('partialList');
-        
-        if (mode === 'full') {
-            fullBox.classList.add('selected');
-            partialBox.classList.remove('selected');
-            partialList.style.display = 'none';
-        } else {
-            partialBox.classList.add('selected');
-            fullBox.classList.remove('selected');
-            partialList.style.display = 'block';
-        }
-    }
-
-    document.getElementById('dataRequestForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Validation for partial selection
-        const isPartial = document.querySelector('input[name="requestType"]:checked').value === 'partial';
-        if (isPartial) {
-            const cache = document.getElementById('dataCache').checked;
-            const history = document.getElementById('dataHistory').checked;
-            const kyc = document.getElementById('dataKyc').checked;
-            
-            if (!cache && !history && !kyc) {
-                alert('Please specify at least one type of data you wish to remove from your Rectoriam account.');
+            if (reduce || !('IntersectionObserver' in window)) {
+                nodes.forEach(function (n) {
+                    n.classList.add('is-in');
+                });
                 return;
+            }
+
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: '0px 0px -80px 0px',
+                threshold: 0
+            });
+
+            nodes.forEach(function (n) {
+                io.observe(n);
+            });
+        })();
+
+        // Mobile navigation panel.
+        (function () {
+            var btn = document.getElementById('navToggle');
+            var panel = document.getElementById('navPanel');
+            if (!btn || !panel) return;
+
+            btn.addEventListener('click', function () {
+                var open = panel.hasAttribute('hidden');
+                if (open) {
+                    panel.removeAttribute('hidden');
+                } else {
+                    panel.setAttribute('hidden', '');
+                }
+                btn.setAttribute('aria-expanded', String(open));
+                btn.querySelector('i').className = 'ph i text-xl ' + (open ? 'ph-x' : 'ph-list');
+            });
+        })();
+    </script>
+
+    <script>
+        // Request-type switch: only one card is active, and the selective list
+        // is revealed with it.
+        function toggleMode(mode) {
+            var full = document.getElementById('boxFull');
+            var partial = document.getElementById('boxPartial');
+            var list = document.getElementById('partialList');
+
+            if (mode === 'full') {
+                full.classList.add('selected');
+                partial.classList.remove('selected');
+                list.style.display = 'none';
+            } else {
+                partial.classList.add('selected');
+                full.classList.remove('selected');
+                list.style.display = 'block';
             }
         }
 
-        // Form submission simulation
-        const btn = document.getElementById('btnSubmit');
-        btn.innerText = 'Authenticating & Submitting...';
-        btn.disabled = true;
+        document.getElementById('dataRequestForm').addEventListener('submit', function (e) {
+            e.preventDefault();
 
-        setTimeout(() => {
-            btn.style.display = 'none';
-            document.querySelector('.footer-note').style.display = 'none';
-            document.getElementById('msgSuccess').style.display = 'block';
-        }, 1500);
-    });
-</script>
+            var partial = document.querySelector('input[name="requestType"]:checked').value === 'partial';
+            if (partial) {
+                var chosen = document.getElementById('dataCache').checked
+                    || document.getElementById('dataHistory').checked
+                    || document.getElementById('dataKyc').checked;
 
+                if (!chosen) {
+                    alert('Please specify at least one type of data you wish to remove from your Rectoriam account.');
+                    return;
+                }
+            }
+
+            var btn = document.getElementById('btnSubmit');
+            btn.textContent = 'Authenticating & Submitting...';
+            btn.disabled = true;
+
+            setTimeout(function () {
+                btn.style.display = 'none';
+                document.getElementById('formNote').style.display = 'none';
+                document.getElementById('msgSuccess').style.display = 'flex';
+            }, 1500);
+        });
+    </script>
 </body>
+
 </html>

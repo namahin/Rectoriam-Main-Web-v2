@@ -1,234 +1,568 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
     <title>Rectoriam - Smart Micro-Investments</title>
+    <link rel="icon" type="image/png" href="img/rectoriam-icon.png">
+
+    <!-- Type: Plus Jakarta Sans (display + body), IBM Plex Mono (structural labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons: Phosphor Icons (one family, regular weight only) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+
+    <!-- Reveal animations only apply when JS can undo them; without JS the page stays visible. -->
+    <script>
+        document.documentElement.classList.add('js');
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: '#f25900',
-                        brandHover: '#d95000',
-                        dark: '#0f172a',
-                        surface: '#f8fafc',
+                        page: 'rgb(var(--c-page) / <alpha-value>)',
+                        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+                        line: 'rgb(var(--c-line) / <alpha-value>)',
+                        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+                        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+                        brand: 'rgb(var(--c-brand) / <alpha-value>)',
+                        brandHover: 'rgb(var(--c-brand-hover) / <alpha-value>)',
+                        brandSoft: 'rgb(var(--c-brand-soft) / <alpha-value>)',
+                        indigo: 'rgb(var(--c-indigo) / <alpha-value>)',
+                        indigoDeep: 'rgb(var(--c-indigo-deep) / <alpha-value>)',
                     },
                     fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                    }
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    borderRadius: {
+                        // SHAPE LOCK: panels = 'panel' (18px), icon tiles = 'tile' (12px),
+                        // every interactive control = rounded-full. No other radii on this page.
+                        panel: '18px',
+                        tile: '12px',
+                    },
+                    maxWidth: {
+                        shell: '1240px'
+                    },
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-text {
-            background: linear-gradient(90deg, #f25900, #ff8c42);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* ---- Token palette. Brand colours come from the Rectoriam logo: orange
+               rgb(242 89 3) is the single accent, indigo rgb(16 6 159) is the
+               structural brand colour. Neutrals are cooled toward the indigo.
+               The page is light only. ---- */
+        :root {
+            --c-page: 250 250 252;
+            --c-surface: 244 245 250;
+            --c-line: 224 226 238;
+            --c-ink: 12 10 45;
+            --c-muted: 84 88 112;
+            --c-brand: 242 89 3;
+            --c-brand-hover: 217 80 0;
+            --c-brand-soft: 255 240 232;
+            --c-indigo: 16 6 159;
+            --c-indigo-deep: 9 4 92;
         }
-        .hero-pattern {
-            background-color: #f8fafc;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px;
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            color-scheme: light;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: rgb(var(--c-page));
+            color: rgb(var(--c-ink));
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: rgb(var(--c-brand) / .22);
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid rgb(var(--c-brand));
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        .i {
+            font-size: 1em;
+            line-height: 1;
+            display: inline-block;
+        }
+
+        /* ---- Scroll reveal. Sequences each section in reading order as it enters,
+               so the eye lands on the headline before the detail. Driven by
+               IntersectionObserver, never a scroll listener. ---- */
+        .js [data-reveal] {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform .7s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: var(--d, 0ms);
+        }
+
+        .js [data-reveal].is-in {
+            opacity: 1;
+            transform: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .001ms !important;
+                transition-duration: .001ms !important;
+            }
         }
     </style>
 </head>
-<body class="bg-white text-slate-700 antialiased">
 
-    <!-- Top Navigation -->
-    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center gap-2 cursor-pointer">
-                    <div class="w-8 h-8 bg-brand rounded flex items-center justify-center text-white font-bold text-xl">R</div>
-                    <span class="font-bold text-2xl text-dark tracking-tight">Rectoriam</span>
+<body class="bg-page text-ink">
+
+    <!-- ============ NAVIGATION ============ -->
+    <nav class="fixed inset-x-0 top-0 z-50 h-[72px] bg-page/85 backdrop-blur-xl border-b border-line">
+        <div class="max-w-shell mx-auto h-full px-4 sm:px-6 lg:px-8">
+            <div class="flex h-full items-center justify-between gap-4">
+
+                <a href="index.html" class="flex-shrink-0 flex items-center" aria-label="Rectoriam home">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 35" fill="currentColor"
+                        class="w-32 sm:w-40 md:w-44">
+                        <path
+                            d="M25.7957 6.50352C25.7985 8.0903 25.2176 9.62269 24.1637 10.8089L0 34.9726V26.1871L12.5493 13.6448L15.0654 16.1609L15.6612 13.0158L17.0294 5.80983L6.67826 7.77382L9.19439 10.2882L6.46858 13.0158L0.00349805 19.4809V5.81682C0.00396138 4.27395 0.617195 2.79442 1.70834 1.7036C2.79948 0.612788 4.27919 -6.95686e-08 5.82207 0H19.2922C21.0178 0.00138879 22.6723 0.687631 23.8924 1.90801C25.1124 3.12839 25.7982 4.78311 25.7992 6.50875"
+                            fill="#FA4C03"></path>
+                        <mask id="mask0_351_2682_nav" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0"
+                            y="19" width="30" height="16">
+                            <path d="M0 34.9725H29.3567L15.7661 19.2083L0 34.9725Z" fill="white"></path>
+                        </mask>
+                        <g mask="url(#mask0_351_2682_nav)">
+                            <path d="M14.6791 4.52826L-7.88184 27.0892L14.6791 49.6502L37.2401 27.0892L14.6791 4.52826Z"
+                                fill="url(#paint0_linear_351_2682_nav)"></path>
+                        </g>
+                        <path
+                            d="M46.9243 21.9218C48.165 21.4029 49.225 20.5295 49.9716 19.4109C50.6869 18.3194 51.0445 17.0182 51.0445 15.5074C51.0445 13.2044 50.2611 11.3989 48.6943 10.0907C47.1276 8.78254 44.9312 8.12963 42.1052 8.13196H33.4263V28.4533H38.1283V22.7937H42.2205C42.2957 22.7937 42.3673 22.7937 42.4407 22.7937L46.3424 28.4585H51.4219L46.8789 21.9445L46.9208 21.927M45.2067 12.9004C45.9231 13.5201 46.2813 14.3909 46.2813 15.5126C46.2813 16.6158 45.9231 17.4819 45.2067 18.1109C44.4903 18.7399 43.4069 19.0545 41.9567 19.0545H38.1248V11.9656H41.9619C43.4134 11.9656 44.4967 12.2754 45.2119 12.8952"
+                            fill="#10069F"></path>
+                        <path
+                            d="M94.261 25.0862C93.9997 25.1002 93.7383 25.0597 93.4935 24.9674C93.2486 24.875 93.0257 24.7328 92.8387 24.5498C92.4892 24.2003 92.3145 23.6761 92.3145 23.0244V16.3199H96.204V12.8375H92.3145V9.38306H87.7854V12.8375H85.3759V16.3199H87.7854V23.0803C87.7854 24.9371 88.2986 26.335 89.3248 27.2738C90.3511 28.2127 91.7827 28.6822 93.6197 28.6822C94.3 28.6841 94.978 28.6014 95.6379 28.4358C96.235 28.2938 96.8007 28.0426 97.3066 27.6949L96.0834 24.5026C95.5571 24.8966 94.913 25.101 94.2557 25.0827"
+                            fill="#10069F"></path>
+                        <path
+                            d="M120.293 14.8888V12.8375H115.968V28.4533H120.497V21.0796C120.497 19.5909 120.879 18.493 121.643 17.7859C122.407 17.0788 123.409 16.7259 124.647 16.727C124.822 16.727 124.986 16.727 125.14 16.741C125.293 16.755 125.47 16.7655 125.664 16.7847V12.6051C124.193 12.6051 122.944 12.8905 121.919 13.4613C121.279 13.812 120.723 14.2994 120.293 14.8888Z"
+                            fill="#10069F"></path>
+                        <path
+                            d="M148.548 14.2878C147.232 13.166 145.385 12.6051 143.006 12.6051C141.77 12.6048 140.539 12.7705 139.347 13.0978C138.249 13.3829 137.208 13.8558 136.272 14.4957L137.897 17.6583C138.51 17.1867 139.203 16.8282 139.943 16.5995C140.732 16.3403 141.558 16.2082 142.389 16.2081C143.606 16.2081 144.511 16.4789 145.103 17.0206C145.694 17.5622 145.99 18.3194 145.989 19.2921H142.389C140.801 19.2921 139.514 19.4901 138.527 19.8862C137.541 20.2822 136.82 20.8291 136.366 21.5269C135.917 22.256 135.68 23.0961 135.683 23.9524C135.685 24.8088 135.927 25.6475 136.38 26.374C136.875 27.1165 137.569 27.705 138.382 28.0724C139.255 28.4882 140.3 28.6962 141.517 28.6962C142.891 28.6962 144.013 28.4346 144.884 27.9116C145.461 27.5711 145.942 27.0902 146.282 26.5138V28.462H150.519V19.5507C150.519 17.1708 149.861 15.4194 148.545 14.2965M144.704 25.1002C144.089 25.4623 143.386 25.6479 142.672 25.6366C141.879 25.6366 141.255 25.4677 140.801 25.1299C140.582 24.9743 140.405 24.767 140.286 24.5264C140.167 24.2859 140.109 24.0196 140.118 23.7513C140.113 23.5028 140.165 23.2565 140.268 23.0304C140.371 22.8043 140.523 22.6041 140.713 22.4443C141.111 22.0948 141.841 21.9201 142.905 21.9201H146.011V23.5171C145.766 24.1743 145.306 24.7288 144.704 25.0897"
+                            fill="#10069F"></path>
+                        <path
+                            d="M179.177 15.6088C178.672 14.6355 177.879 13.8421 176.906 13.3373C175.883 12.8284 174.752 12.5742 173.61 12.5965C172.214 12.5706 170.84 12.9434 169.649 13.6711C169.014 14.0611 168.452 14.5597 167.989 15.1441C167.633 14.5629 167.157 14.0652 166.591 13.685C165.479 12.9477 164.167 12.5679 162.833 12.5965C161.644 12.5752 160.469 12.8598 159.422 13.4229C158.855 13.7384 158.349 14.1526 157.928 14.6461V12.8376H153.616V28.4534H158.143V20.6167C158.143 19.6848 158.288 18.92 158.578 18.3224C158.837 17.7578 159.265 17.2868 159.801 16.9735C160.341 16.669 160.952 16.5134 161.571 16.5227C162.519 16.5227 163.25 16.8226 163.764 17.4226C164.278 18.0225 164.534 18.9544 164.533 20.2183V28.4621H169.06V20.6167C169.06 19.6848 169.205 18.92 169.495 18.3224C169.755 17.7578 170.182 17.2868 170.718 16.9735C171.258 16.669 171.869 16.5134 172.488 16.5227C173.437 16.5227 174.172 16.8226 174.695 17.4226C175.218 18.0225 175.479 18.9544 175.478 20.2183V28.4621H180V19.5141C180 17.9275 179.724 16.6258 179.172 15.6088"
+                            fill="#10069F"></path>
+                        <path
+                            d="M105.694 12.4409C104.104 12.4409 102.55 12.9123 101.228 13.7955C99.9064 14.6787 98.8762 15.934 98.2678 17.4027C97.6595 18.8714 97.5003 20.4875 97.8105 22.0467C98.1206 23.6058 98.8861 25.038 100.01 26.1621C101.134 27.2862 102.566 28.0517 104.126 28.3618C105.685 28.6719 107.301 28.5128 108.77 27.9044C110.238 27.2961 111.494 26.2659 112.377 24.9441C113.26 23.6223 113.731 22.0683 113.731 20.4786C113.731 18.3469 112.885 16.3024 111.377 14.7951C109.87 13.2877 107.825 12.4409 105.694 12.4409ZM105.694 25.0513C104.79 25.0513 103.906 24.7832 103.154 24.281C102.402 23.7787 101.817 23.0648 101.471 22.2296C101.125 21.3943 101.034 20.4753 101.211 19.5886C101.387 18.7019 101.822 17.8874 102.461 17.2482C103.101 16.6089 103.915 16.1735 104.802 15.9972C105.689 15.8208 106.608 15.9113 107.443 16.2573C108.278 16.6033 108.992 17.1891 109.494 17.9408C109.997 18.6925 110.265 19.5763 110.265 20.4803C110.263 21.6922 109.781 22.854 108.924 23.711C108.067 24.5679 106.906 25.0499 105.694 25.0513Z"
+                            fill="#10069F"></path>
+                        <path
+                            d="M60.2406 25.2173C59.4854 25.2171 58.742 25.0294 58.0772 24.6711C57.4123 24.3127 56.8469 23.795 56.4315 23.1642L61.483 21.8869L64.7907 21.0534L68.2643 20.1798C68.1583 18.0802 67.234 16.1058 65.6895 14.6797C64.1449 13.2536 62.1031 12.4893 60.0018 12.5508C57.9005 12.6123 55.9069 13.4946 54.4484 15.0086C52.9899 16.5225 52.1825 18.5477 52.1995 20.6498C52.1995 20.7791 52.203 20.9067 52.21 21.0325C52.2832 22.5886 52.8071 24.0898 53.7178 25.3537C54.6286 26.6175 55.887 27.5894 57.34 28.1513C58.7929 28.7131 60.3778 28.8406 61.9019 28.5182C63.426 28.1959 64.8236 27.4376 65.9247 26.3356L63.4697 23.8789C63.0463 24.3041 62.5431 24.6416 61.989 24.8719C61.4349 25.1022 60.8407 25.2207 60.2406 25.2208M57.0099 17.4173C57.4832 16.9435 58.055 16.5796 58.6847 16.3515C59.3144 16.1234 59.9866 16.0366 60.6535 16.0973C61.3205 16.158 61.966 16.3647 62.5442 16.7027C63.1223 17.0408 63.6191 17.5018 63.9991 18.0533L58.9319 19.3358L55.7029 20.1518C55.816 19.1174 56.279 18.1527 57.0151 17.4173"
+                            fill="#10069F"></path>
+                        <path
+                            d="M81.3168 22.8461L84.3606 24.5183C83.5026 26.0841 82.1476 27.3197 80.5094 28.03C78.8713 28.7403 77.0432 28.8849 75.3138 28.441C73.5843 27.9971 72.0519 26.99 70.9583 25.5786C69.8647 24.1672 69.2722 22.4318 69.2743 20.6463C69.2746 20.3198 69.2944 19.9936 69.3337 19.6695C69.4566 18.6528 69.774 17.6693 70.2685 16.7725C70.385 16.5546 70.516 16.3415 70.6617 16.1329C71.4337 14.9931 72.4856 14.0706 73.7165 13.454C74.9474 12.8373 76.3161 12.5472 77.6913 12.6114C79.0666 12.6756 80.4022 13.092 81.5704 13.8206C82.7385 14.5492 83.6999 15.5656 84.3624 16.7725L81.3186 18.4464C80.9251 17.7284 80.3458 17.1294 79.6414 16.7122C78.937 16.2949 78.1333 16.0748 77.3146 16.0748C76.4958 16.0748 75.6922 16.2949 74.9877 16.7122C74.2833 17.1294 73.704 17.7284 73.3106 18.4464C73.2636 18.5279 73.221 18.6119 73.183 18.698C72.8929 19.3064 72.7436 19.9723 72.7462 20.6463C72.7454 21.6607 73.0823 22.6465 73.7037 23.4482C74.3252 24.2499 75.1958 24.822 76.1784 25.0741C77.1609 25.3263 78.1994 25.2442 79.1302 24.8408C80.0609 24.4373 80.8308 23.7356 81.3186 22.8461"
+                            fill="#10069F"></path>
+                        <path d="M132.98 12.8375H128.453V28.4533H132.98V12.8375Z" fill="#10069F"></path>
+                        <path
+                            d="M132.982 6.28162C131.781 6.28162 130.629 6.7586 129.78 7.60763C128.931 8.45667 128.454 9.60821 128.454 10.8089H132.983L132.982 6.28162Z"
+                            fill="#FA4C03"></path>
+                        <defs>
+                            <linearGradient id="paint0_linear_351_2682_nav" x1="6.64824" y1="16.9224" x2="16.0841"
+                                y2="26.3583" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#DA2922"></stop>
+                                <stop offset="1" stop-color="#FA4C03"></stop>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </a>
+
+                <div class="hidden md:flex flex-1 justify-center items-center gap-7 lg:gap-9">
+                    <a href="index.html"
+                        class="text-[15px] font-semibold text-ink relative after:absolute after:-bottom-1.5 after:left-0 after:h-[2px] after:w-full after:bg-brand">Home</a>
+                    <a href="about-us.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">About
+                        Us</a>
+                    <a href="privacy-policy.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">Privacy
+                        Policy</a>
+                    <a href="terms-conditions.html"
+                        class="text-[15px] font-medium text-muted hover:text-ink transition-colors duration-200">Terms</a>
                 </div>
+
+                <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+                    <a href="https://app.rectoriam.com/login"
+                        class="hidden sm:inline-flex items-center px-3 py-2 text-[15px] font-semibold text-muted hover:text-ink transition-colors duration-200">Login</a>
+                    <a href="https://app.rectoriam.com/sign-up"
+                        class="inline-flex items-center rounded-full bg-brand px-6 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-brandHover active:translate-y-px">SignUp</a>
+                    <button type="button" id="navToggle" aria-label="Menu" aria-expanded="false"
+                        aria-controls="navPanel"
+                        class="md:hidden ml-1 grid h-10 w-10 place-items-center rounded-full border border-line text-ink transition-colors duration-200 hover:bg-surface">
+                        <i class="ph ph-list i text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile panel: same four destinations, no new labels. -->
+        <div id="navPanel" hidden class="md:hidden border-t border-line bg-page/95 backdrop-blur-xl">
+            <div class="max-w-shell mx-auto px-4 sm:px-6 py-4 flex flex-col">
+                <a href="index.html" class="py-3 text-base font-semibold text-brand">Home</a>
+                <a href="about-us.html" class="py-3 text-base font-medium text-muted border-t border-line">About Us</a>
+                <a href="privacy-policy.html" class="py-3 text-base font-medium text-muted border-t border-line">Privacy
+                    Policy</a>
+                <a href="terms-conditions.html"
+                    class="py-3 text-base font-medium text-muted border-t border-line">Terms</a>
+                <a href="https://app.rectoriam.com/login"
+                    class="py-3 text-base font-medium text-muted border-t border-line sm:hidden">Login</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden hero-pattern border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            
-            <!-- Compliance Badge -->
-            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-orange-50 border border-orange-200 text-brand text-sm font-semibold mb-8">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 1.05 3.61-2.008 9.11-8 10.999-5.992-1.889-9.05-7.39-8-11A11.954 11.954 0 012.166 5z" clip-rule="evenodd"></path></svg>
-                Regulated under Canadian Jurisdiction | Compliant with Global AML Standards
+    <main>
+
+        <!-- ============ HERO :: editorial, copy split against the compliance note ============ -->
+        <section
+            class="relative flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-line pt-[calc(72px+2rem)] pb-14 lg:pt-[calc(72px+2.5rem)] lg:pb-16">
+            <div aria-hidden="true"
+                class="pointer-events-none absolute -top-52 right-[-8%] h-[640px] w-[640px] rounded-full bg-brand/10 blur-[130px]">
+            </div>
+            <div aria-hidden="true"
+                class="pointer-events-none absolute -bottom-64 left-[-16%] h-[560px] w-[560px] rounded-full bg-indigo/[0.08] blur-[130px]">
             </div>
 
-            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-dark tracking-tight mb-6 leading-tight">
-                Strategic Micro-Investments, <br />
-                <span class="gradient-text">Simplified & Secured.</span>
-            </h1>
-            
-            <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
-                Rectoriam is a sophisticated digital wallet and asset allocation platform. We empower users to securely manage funds, execute P2P transfers, and participate in structured, fixed-term portfolios across global sectors—all within a transparent and legally compliant environment.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button class="bg-brand hover:bg-brandHover text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg flex items-center justify-center gap-2">
-                    Download Android App
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                </button>
-            </div>
-            <p class="mt-6 text-sm text-slate-500 font-medium">Mandatory Identity Verification (KYC) is strictly enforced for all outbound transactions.</p>
-        </div>
-    </section>
+            <div class="relative max-w-shell mx-auto px-4 text-center sm:px-6 lg:px-8">
 
-    <!-- Why Choose Rectoriam (Core Philosophy) -->
-    <section class="py-24 bg-white border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-6">A Financial Ecosystem Built on Trust.</h2>
-                <p class="text-slate-600 text-lg leading-relaxed mb-6">
-                    In today’s digital economy, financial participation should not be restricted by traditional borders, yet security and regulatory compliance must never be compromised. Rectoriam was engineered to bridge this gap. We are not a speculative trading platform; we are a structured digital wallet and asset management utility operating under Canadian legal frameworks.
-                </p>
-                <p class="text-slate-600 text-lg leading-relaxed">
-                    Our core philosophy is straightforward: Provide a transparent, verifiable ledger where users can deposit funds using localized gateways (such as bKash, Nagad) or standard cryptocurrency networks, strategically allocate those funds into tangible sector-based portfolios, and monitor projected yields in real-time.
-                </p>
-            </div>
-        </div>
-    </section>
+                <div data-reveal
+                    class="inline-flex items-center gap-2.5 rounded-full border border-brand/30 bg-brandSoft px-4 py-2 text-[13px] font-semibold leading-snug text-ink">
+                    <i class="ph ph-shield-check i mt-px text-base text-brand" aria-hidden="true"></i>
+                    Regulated under Canadian Jurisdiction | Compliant with Global AML Standards
+                </div>
 
-    <!-- Platform Modules / Features -->
-    <section class="py-24 bg-surface">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Engineered for Seamless Asset Management</h2>
-                <p class="text-slate-600 text-lg">A fully integrated suite of tools designed to optimize your digital capital.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Module 1 -->
-                <div class="p-8 rounded-2xl border border-slate-200 bg-white hover:border-brand transition-colors relative overflow-hidden shadow-sm">
-                    <div class="w-12 h-12 bg-orange-100 text-brand rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <h1 data-reveal style="--d:70ms"
+                    class="mx-auto mt-6 max-w-[20ch] text-[2.15rem] font-extrabold leading-[1.1] tracking-[-0.03em] sm:max-w-none sm:text-[2.5rem] md:text-[2.875rem] lg:text-[3.375rem] xl:text-[3.75rem]">
+                    Strategic Micro-Investments, <br class="hidden sm:block" />
+                    <span class="text-brand">Simplified &amp; Secured.</span>
+                </h1>
+
+                <div class="mt-7">
+                    <div data-reveal style="--d:140ms" class="mx-auto max-w-3xl">
+                        <p class="text-[1.0625rem] leading-[1.75] text-muted lg:text-[1.125rem]">
+                            Rectoriam is a sophisticated digital wallet and asset allocation platform. We empower users
+                            to securely manage funds, execute P2P transfers, and participate in structured, fixed-term
+                            portfolios across global sectors—all within a transparent and legally compliant environment.
+                        </p>
+                        <button type="button"
+                            class="mt-8 inline-flex items-center justify-center gap-2.5 rounded-full bg-brand px-8 py-4 text-lg font-bold text-white shadow-[0_14px_34px_-12px_rgb(var(--c-brand)/.65)] transition-colors duration-200 hover:bg-brandHover active:translate-y-px">
+                            <i class="ph ph-google-play-logo i text-xl" aria-hidden="true"></i>Download Android
+                            App</button>
+
+                        <p class="mt-6 text-[14px] font-medium leading-[1.7] text-muted italic">Mandatory Identity Verification (KYC) is strictly enforced for all outbound transactions.</p>
                     </div>
-                    <h3 class="text-xl font-bold text-dark mb-3 relative z-10">Secure Wallet Funding</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm relative z-10">Your journey begins with a secure deposit. Integrate with trusted regional payment gateways (bKash, Nagad) or Crypto networks. All inbound transactions are heavily encrypted, ensuring your capital is protected and instantly available.</p>
-                </div>
-
-                <!-- Module 2 -->
-                <div class="p-8 rounded-2xl border border-slate-200 bg-white hover:border-brand transition-colors relative overflow-hidden shadow-sm">
-                    <div class="w-12 h-12 bg-orange-100 text-brand rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-dark mb-3 relative z-10">Structured Sector Portfolios</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm relative z-10">Diversification is the key to risk management. Subscribe to 15-day or 30-day fixed-term plans in high-growth sectors like AI, Green Energy, or Real Estate. Monitor historical data-driven expected returns directly from your dashboard.</p>
-                </div>
-
-                <!-- Module 3 -->
-                <div class="p-8 rounded-2xl border border-slate-200 bg-white hover:border-brand transition-colors relative overflow-hidden shadow-sm">
-                    <div class="w-12 h-12 bg-orange-100 text-brand rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-dark mb-3 relative z-10">Verified P2P & Withdrawals</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm relative z-10">Liquidity matters. Execute instant Peer-to-Peer (P2P) internal transfers to other verified users using OTP authentication. Upon portfolio maturity, seamlessly request withdrawals to your designated, KYC-approved receiving accounts.</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Investment Categories Showcase -->
-    <section class="py-24 bg-white border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold text-dark mb-4">Diversified Asset Allocation</h2>
-                <p class="text-slate-600">Explore fixed-term plans across high-yield global sectors.</p>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="border border-slate-200 rounded-xl p-6 text-center shadow-sm">
-                    <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-3 text-2xl">🛢️</div>
-                    <h4 class="font-bold text-dark text-sm">Crude Oil & Mining</h4>
-                </div>
-                <div class="border border-slate-200 rounded-xl p-6 text-center shadow-sm">
-                    <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-3 text-2xl">🤖</div>
-                    <h4 class="font-bold text-dark text-sm">Tech (AI & IoT)</h4>
-                </div>
-                <div class="border border-slate-200 rounded-xl p-6 text-center shadow-sm">
-                    <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-3 text-2xl">☀️</div>
-                    <h4 class="font-bold text-dark text-sm">Green Energy</h4>
-                </div>
-                <div class="border border-slate-200 rounded-xl p-6 text-center shadow-sm">
-                    <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-3 text-2xl">📜</div>
-                    <h4 class="font-bold text-dark text-sm">Treasury Bonds</h4>
-                </div>
-            </div>
-        </div>
-    </section>
+        <!-- ============ PHILOSOPHY :: editorial prose spread ============ -->
+        <section class="border-b border-line py-20 lg:py-28">
+            <div class="max-w-shell mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 data-reveal
+                    class="max-w-[18ch] text-[1.875rem] font-extrabold leading-[1.16] tracking-[-0.025em] md:text-[2.25rem] lg:text-[3rem]">
+                    A Financial Ecosystem Built on Trust.
+                </h2>
 
-    <!-- Security & Compliance Section (Critical for Trust) -->
-    <section class="py-24 bg-dark text-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6">Uncompromising Security & Compliance.</h2>
-                    <p class="text-slate-400 text-lg leading-relaxed mb-8">
-                        Operating under the jurisdiction of Canada, we adhere to stringent international financial regulations and Anti-Money Laundering (AML) directives.
+                <div data-reveal style="--d:90ms"
+                    class="mt-12 grid gap-10 border-t border-line pt-12 md:grid-cols-2 md:gap-16">
+                    <p class="text-[1.0625rem] leading-[1.8] text-muted">
+                        In today’s digital economy, financial participation should not be restricted by traditional
+                        borders, yet security and regulatory compliance must never be compromised. Rectoriam was
+                        engineered to bridge this gap. We are not a speculative trading platform; we are a structured
+                        digital wallet and asset management utility operating under Canadian legal frameworks.
                     </p>
-                    <ul class="space-y-6">
-                        <li class="flex items-start gap-4">
-                            <div class="mt-1 p-2 bg-slate-800 rounded text-brand">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            </div>
-                            <div>
-                                <strong class="block text-white text-lg">Mandatory KYC Verification</strong>
-                                <span class="text-slate-400 text-sm leading-relaxed">Government-issued identification must be verified by our compliance team prior to initiating any withdrawals.</span>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="mt-1 p-2 bg-slate-800 rounded text-brand">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            </div>
-                            <div>
-                                <strong class="block text-white text-lg">Bank-Grade Encryption</strong>
-                                <span class="text-slate-400 text-sm leading-relaxed">API communications are secured via HTTPS/TLS. Sensitive documents are stored using advanced cryptographic protocols.</span>
-                            </div>
-                        </li>
-                    </ul>
+                    <p class="text-[1.0625rem] leading-[1.8] text-muted">
+                        Our core philosophy is straightforward: Provide a transparent, verifiable ledger where users can
+                        deposit funds using localized gateways (such as bKash, Nagad) or standard cryptocurrency
+                        networks, strategically allocate those funds into tangible sector-based portfolios, and monitor
+                        projected yields in real-time.
+                    </p>
                 </div>
-                
-                <!-- Legal Info Box -->
-                <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl">
-                    <h3 class="text-xl font-bold mb-4">Transparency First</h3>
-                    <p class="text-slate-400 text-sm mb-6">Rectoriam is committed to full transparency regarding data collection and financial operations, in strict compliance with Google Play's Developer Policies.</p>
-                    <div class="p-4 bg-slate-700/50 rounded-lg border border-slate-600 flex items-center justify-between">
-                         <span class="font-medium">Account & Data Deletion</span>
-                         <span class="text-xs bg-brand text-white px-2 py-1 rounded">Compliant</span>
+            </div>
+        </section>
+
+        <!-- ============ MODULES :: hairline-divided rows, no cards, no imagery ============ -->
+        <section class="border-b border-line bg-surface py-20 lg:py-28">
+            <div class="max-w-shell mx-auto px-4 sm:px-6 lg:px-8">
+                <div data-reveal class="max-w-2xl">
+                    <h2
+                        class="text-[1.875rem] font-extrabold leading-[1.16] tracking-[-0.025em] md:text-[2.25rem] lg:text-[3rem]">
+                        Engineered for Seamless Asset Management
+                    </h2>
+                    <p class="mt-5 text-lg leading-relaxed text-muted">
+                        A fully integrated suite of tools designed to optimize your digital capital.
+                    </p>
+                </div>
+
+                <div class="mt-14 border-t border-line">
+                    <article data-reveal
+                        class="grid gap-5 border-b border-line py-10 lg:grid-cols-12 lg:gap-10 lg:py-12">
+                        <div class="flex items-start gap-4 lg:col-span-5">
+                            <span
+                                class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-brand text-white">
+                                <i class="ph ph-wallet i text-2xl" aria-hidden="true"></i>
+                            </span>
+                            <h3 class="text-2xl font-bold leading-tight tracking-[-0.02em] lg:pt-1">Secure Wallet
+                                Funding</h3>
+                        </div>
+                        <p class="text-[1.0625rem] leading-[1.8] text-muted lg:col-span-7">
+                            Your journey begins with a secure deposit. Integrate with trusted regional payment gateways
+                            (bKash, Nagad) or Crypto networks. All inbound transactions are heavily encrypted, ensuring
+                            your capital is protected and instantly available.
+                        </p>
+                    </article>
+
+                    <article data-reveal style="--d:80ms"
+                        class="grid gap-5 border-b border-line py-10 lg:grid-cols-12 lg:gap-10 lg:py-12">
+                        <div class="flex items-start gap-4 lg:col-span-5">
+                            <span
+                                class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-indigo text-white">
+                                <i class="ph ph-chart-pie-slice i text-2xl" aria-hidden="true"></i>
+                            </span>
+                            <h3 class="text-2xl font-bold leading-tight tracking-[-0.02em] lg:pt-1">Structured Sector
+                                Portfolios</h3>
+                        </div>
+                        <p class="text-[1.0625rem] leading-[1.8] text-muted lg:col-span-7">
+                            Diversification is the key to risk management. Subscribe to 15-day or 30-day fixed-term
+                            plans in high-growth sectors like AI, Green Energy, or Real Estate. Monitor historical
+                            data-driven expected returns directly from your dashboard.
+                        </p>
+                    </article>
+
+                    <article data-reveal style="--d:160ms" class="grid gap-5 py-10 lg:grid-cols-12 lg:gap-10 lg:py-12">
+                        <div class="flex items-start gap-4 lg:col-span-5">
+                            <span
+                                class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-brand text-white">
+                                <i class="ph ph-arrows-left-right i text-2xl" aria-hidden="true"></i>
+                            </span>
+                            <h3 class="text-2xl font-bold leading-tight tracking-[-0.02em] lg:pt-1">Verified P2P &amp;
+                                Withdrawals</h3>
+                        </div>
+                        <p class="text-[1.0625rem] leading-[1.8] text-muted lg:col-span-7">
+                            Liquidity matters. Execute instant Peer-to-Peer (P2P) internal transfers to other verified
+                            users using OTP authentication. Upon portfolio maturity, seamlessly request withdrawals to
+                            your designated, KYC-approved receiving accounts.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SECURITY :: single brand colour block ============ -->
+        <section class="bg-indigoDeep py-20 text-white lg:py-28">
+            <div class="max-w-shell mx-auto px-4 sm:px-6 lg:px-8">
+                <div data-reveal class="max-w-3xl">
+                    <h2
+                        class="text-[1.875rem] font-extrabold leading-[1.16] tracking-[-0.025em] md:text-[2.25rem] lg:text-[3rem]">
+                        Uncompromising Security &amp; Compliance.
+                    </h2>
+                    <p class="mt-5 max-w-[62ch] text-[1.0625rem] leading-[1.8] text-white/70">
+                        Operating under the jurisdiction of Canada, we adhere to stringent international financial
+                        regulations and Anti-Money Laundering (AML) directives.
+                    </p>
+                </div>
+
+                <div data-reveal style="--d:90ms"
+                    class="mt-14 grid gap-y-10 border-t border-white/15 pt-12 md:grid-cols-2 md:gap-x-16 md:divide-x md:divide-white/15">
+                    <div class="md:pr-16">
+                        <span class="grid h-11 w-11 place-items-center rounded-tile bg-brand text-white">
+                            <i class="ph ph-identification-card i text-xl" aria-hidden="true"></i>
+                        </span>
+                        <strong class="mt-5 block text-lg font-bold">Mandatory KYC Verification</strong>
+                        <span class="mt-2 block text-[15px] leading-[1.75] text-white/70">Government-issued
+                            identification must be verified by our compliance team prior to initiating any
+                            withdrawals.</span>
+                    </div>
+                    <div class="md:pl-16">
+                        <span class="grid h-11 w-11 place-items-center rounded-tile bg-brand text-white">
+                            <i class="ph ph-lock-key i text-xl" aria-hidden="true"></i>
+                        </span>
+                        <strong class="mt-5 block text-lg font-bold">Bank-Grade Encryption</strong>
+                        <span class="mt-2 block text-[15px] leading-[1.75] text-white/70">API communications are secured
+                            via HTTPS/TLS. Sensitive documents are stored using advanced cryptographic protocols.</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Ecosystem / Rewards -->
-    <section class="py-24 bg-white">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="w-16 h-16 mx-auto bg-orange-100 text-brand rounded-full flex items-center justify-center mb-6">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div data-reveal style="--d:150ms"
+                    class="mt-12 grid gap-8 rounded-panel border border-white/15 bg-white/[0.06] p-7 sm:p-9 lg:grid-cols-12 lg:items-center lg:gap-12">
+                    <div class="lg:col-span-7">
+                        <h3 class="text-xl font-bold tracking-[-0.01em]">Transparency First</h3>
+                        <p class="mt-3 text-[15px] leading-[1.75] text-white/70">Rectoriam is committed to full
+                            transparency regarding data collection and financial operations, in strict compliance with
+                            Google Play's Developer Policies.</p>
+                    </div>
+                    <a href="account-deletion.html"
+                        class="flex items-center justify-between gap-4 rounded-full border border-white/20 bg-white/[0.07] py-2 px-2 pl-6 transition-colors duration-200 hover:border-white/45 lg:col-span-5">
+                        <span class="text-[15px] font-semibold">Account &amp; Data Deletion</span>
+                        <span class="rounded-full bg-brand px-4 py-2 text-s font-bold">Compliant</span>
+                    </a>
+                </div>
             </div>
-            <h2 class="text-3xl md:text-4xl font-bold text-dark mb-6">The Rector Coin Ecosystem.</h2>
-            <p class="text-slate-600 text-lg leading-relaxed mb-8">
-                Beyond standard asset management, Rectoriam features an internal loyalty ecosystem. Active users are rewarded with Rector Coins (RCC) for daily platform engagement and successful network referrals. These points act as a metric of your community contribution and can be converted into your primary wallet balance based on dynamic platform conversion rates.
-            </p>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer class="bg-surface py-12 border-t border-slate-200 text-center">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-sm text-slate-500 font-medium">
+        <!-- ============ RECTOR COIN :: closing statement ============ -->
+        <section class="py-20 lg:py-28">
+            <div data-reveal class="max-w-3xl mx-auto px-4 text-center sm:px-6 lg:px-8">
+                <span class="mx-auto grid h-14 w-14 place-items-center rounded-tile bg-brandSoft text-brand">
+                    <i class="ph ph-currency-circle-dollar i text-3xl" aria-hidden="true"></i>
+                </span>
+                <h2
+                    class="mt-7 text-[1.875rem] font-extrabold leading-[1.16] tracking-[-0.025em] md:text-[2.25rem] lg:text-[3rem]">
+                    The Rector Coin Ecosystem.
+                </h2>
+                <p class="mt-6 text-[1.0625rem] leading-[1.8] text-muted">
+                    Beyond standard asset management, Rectoriam features an internal loyalty ecosystem. Active users are
+                    rewarded with Rector Coins (RCC) for daily platform engagement and successful network referrals.
+                    These points act as a metric of your community contribution and can be converted into your primary
+                    wallet balance based on dynamic platform conversion rates.
+                </p>
+                <button type="button"
+                    class="mt-9 inline-flex items-center justify-center gap-2.5 rounded-full bg-brand px-8 py-4 text-lg font-bold text-white shadow-[0_14px_34px_-12px_rgb(var(--c-brand)/.65)] transition-colors duration-200 hover:bg-brandHover active:translate-y-px">
+                    <i class="ph ph-google-play-logo i text-xl" aria-hidden="true"></i>Download Android App</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="border-t border-line bg-surface py-12">
+        <div
+            class="max-w-shell mx-auto flex flex-col items-center gap-6 px-4 sm:px-6 lg:flex-row lg:justify-between lg:px-8">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 35" fill="currentColor" class="w-36"
+                aria-hidden="true">
+                <path
+                    d="M25.7957 6.50352C25.7985 8.0903 25.2176 9.62269 24.1637 10.8089L0 34.9726V26.1871L12.5493 13.6448L15.0654 16.1609L15.6612 13.0158L17.0294 5.80983L6.67826 7.77382L9.19439 10.2882L6.46858 13.0158L0.00349805 19.4809V5.81682C0.00396138 4.27395 0.617195 2.79442 1.70834 1.7036C2.79948 0.612788 4.27919 -6.95686e-08 5.82207 0H19.2922C21.0178 0.00138879 22.6723 0.687631 23.8924 1.90801C25.1124 3.12839 25.7982 4.78311 25.7992 6.50875"
+                    fill="#FA4C03"></path>
+                <mask id="mask0_351_2682_foot" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="19"
+                    width="30" height="16">
+                    <path d="M0 34.9725H29.3567L15.7661 19.2083L0 34.9725Z" fill="white"></path>
+                </mask>
+                <g mask="url(#mask0_351_2682_foot)">
+                    <path d="M14.6791 4.52826L-7.88184 27.0892L14.6791 49.6502L37.2401 27.0892L14.6791 4.52826Z"
+                        fill="url(#paint0_linear_351_2682_foot)"></path>
+                </g>
+                <path
+                    d="M46.9243 21.9218C48.165 21.4029 49.225 20.5295 49.9716 19.4109C50.6869 18.3194 51.0445 17.0182 51.0445 15.5074C51.0445 13.2044 50.2611 11.3989 48.6943 10.0907C47.1276 8.78254 44.9312 8.12963 42.1052 8.13196H33.4263V28.4533H38.1283V22.7937H42.2205C42.2957 22.7937 42.3673 22.7937 42.4407 22.7937L46.3424 28.4585H51.4219L46.8789 21.9445L46.9208 21.927M45.2067 12.9004C45.9231 13.5201 46.2813 14.3909 46.2813 15.5126C46.2813 16.6158 45.9231 17.4819 45.2067 18.1109C44.4903 18.7399 43.4069 19.0545 41.9567 19.0545H38.1248V11.9656H41.9619C43.4134 11.9656 44.4967 12.2754 45.2119 12.8952"
+                    fill="#10069F"></path>
+                <path
+                    d="M94.261 25.0862C93.9997 25.1002 93.7383 25.0597 93.4935 24.9674C93.2486 24.875 93.0257 24.7328 92.8387 24.5498C92.4892 24.2003 92.3145 23.6761 92.3145 23.0244V16.3199H96.204V12.8375H92.3145V9.38306H87.7854V12.8375H85.3759V16.3199H87.7854V23.0803C87.7854 24.9371 88.2986 26.335 89.3248 27.2738C90.3511 28.2127 91.7827 28.6822 93.6197 28.6822C94.3 28.6841 94.978 28.6014 95.6379 28.4358C96.235 28.2938 96.8007 28.0426 97.3066 27.6949L96.0834 24.5026C95.5571 24.8966 94.913 25.101 94.2557 25.0827"
+                    fill="#10069F"></path>
+                <path
+                    d="M120.293 14.8888V12.8375H115.968V28.4533H120.497V21.0796C120.497 19.5909 120.879 18.493 121.643 17.7859C122.407 17.0788 123.409 16.7259 124.647 16.727C124.822 16.727 124.986 16.727 125.14 16.741C125.293 16.755 125.47 16.7655 125.664 16.7847V12.6051C124.193 12.6051 122.944 12.8905 121.919 13.4613C121.279 13.812 120.723 14.2994 120.293 14.8888Z"
+                    fill="#10069F"></path>
+                <path
+                    d="M148.548 14.2878C147.232 13.166 145.385 12.6051 143.006 12.6051C141.77 12.6048 140.539 12.7705 139.347 13.0978C138.249 13.3829 137.208 13.8558 136.272 14.4957L137.897 17.6583C138.51 17.1867 139.203 16.8282 139.943 16.5995C140.732 16.3403 141.558 16.2082 142.389 16.2081C143.606 16.2081 144.511 16.4789 145.103 17.0206C145.694 17.5622 145.99 18.3194 145.989 19.2921H142.389C140.801 19.2921 139.514 19.4901 138.527 19.8862C137.541 20.2822 136.82 20.8291 136.366 21.5269C135.917 22.256 135.68 23.0961 135.683 23.9524C135.685 24.8088 135.927 25.6475 136.38 26.374C136.875 27.1165 137.569 27.705 138.382 28.0724C139.255 28.4882 140.3 28.6962 141.517 28.6962C142.891 28.6962 144.013 28.4346 144.884 27.9116C145.461 27.5711 145.942 27.0902 146.282 26.5138V28.462H150.519V19.5507C150.519 17.1708 149.861 15.4194 148.545 14.2965M144.704 25.1002C144.089 25.4623 143.386 25.6479 142.672 25.6366C141.879 25.6366 141.255 25.4677 140.801 25.1299C140.582 24.9743 140.405 24.767 140.286 24.5264C140.167 24.2859 140.109 24.0196 140.118 23.7513C140.113 23.5028 140.165 23.2565 140.268 23.0304C140.371 22.8043 140.523 22.6041 140.713 22.4443C141.111 22.0948 141.841 21.9201 142.905 21.9201H146.011V23.5171C145.766 24.1743 145.306 24.7288 144.704 25.0897"
+                    fill="#10069F"></path>
+                <path
+                    d="M179.177 15.6088C178.672 14.6355 177.879 13.8421 176.906 13.3373C175.883 12.8284 174.752 12.5742 173.61 12.5965C172.214 12.5706 170.84 12.9434 169.649 13.6711C169.014 14.0611 168.452 14.5597 167.989 15.1441C167.633 14.5629 167.157 14.0652 166.591 13.685C165.479 12.9477 164.167 12.5679 162.833 12.5965C161.644 12.5752 160.469 12.8598 159.422 13.4229C158.855 13.7384 158.349 14.1526 157.928 14.6461V12.8376H153.616V28.4534H158.143V20.6167C158.143 19.6848 158.288 18.92 158.578 18.3224C158.837 17.7578 159.265 17.2868 159.801 16.9735C160.341 16.669 160.952 16.5134 161.571 16.5227C162.519 16.5227 163.25 16.8226 163.764 17.4226C164.278 18.0225 164.534 18.9544 164.533 20.2183V28.4621H169.06V20.6167C169.06 19.6848 169.205 18.92 169.495 18.3224C169.755 17.7578 170.182 17.2868 170.718 16.9735C171.258 16.669 171.869 16.5134 172.488 16.5227C173.437 16.5227 174.172 16.8226 174.695 17.4226C175.218 18.0225 175.479 18.9544 175.478 20.2183V28.4621H180V19.5141C180 17.9275 179.724 16.6258 179.172 15.6088"
+                    fill="#10069F"></path>
+                <path
+                    d="M105.694 12.4409C104.104 12.4409 102.55 12.9123 101.228 13.7955C99.9064 14.6787 98.8762 15.934 98.2678 17.4027C97.6595 18.8714 97.5003 20.4875 97.8105 22.0467C98.1206 23.6058 98.8861 25.038 100.01 26.1621C101.134 27.2862 102.566 28.0517 104.126 28.3618C105.685 28.6719 107.301 28.5128 108.77 27.9044C110.238 27.2961 111.494 26.2659 112.377 24.9441C113.26 23.6223 113.731 22.0683 113.731 20.4786C113.731 18.3469 112.885 16.3024 111.377 14.7951C109.87 13.2877 107.825 12.4409 105.694 12.4409ZM105.694 25.0513C104.79 25.0513 103.906 24.7832 103.154 24.281C102.402 23.7787 101.817 23.0648 101.471 22.2296C101.125 21.3943 101.034 20.4753 101.211 19.5886C101.387 18.7019 101.822 17.8874 102.461 17.2482C103.101 16.6089 103.915 16.1735 104.802 15.9972C105.689 15.8208 106.608 15.9113 107.443 16.2573C108.278 16.6033 108.992 17.1891 109.494 17.9408C109.997 18.6925 110.265 19.5763 110.265 20.4803C110.263 21.6922 109.781 22.854 108.924 23.711C108.067 24.5679 106.906 25.0499 105.694 25.0513Z"
+                    fill="#10069F"></path>
+                <path
+                    d="M60.2406 25.2173C59.4854 25.2171 58.742 25.0294 58.0772 24.6711C57.4123 24.3127 56.8469 23.795 56.4315 23.1642L61.483 21.8869L64.7907 21.0534L68.2643 20.1798C68.1583 18.0802 67.234 16.1058 65.6895 14.6797C64.1449 13.2536 62.1031 12.4893 60.0018 12.5508C57.9005 12.6123 55.9069 13.4946 54.4484 15.0086C52.9899 16.5225 52.1825 18.5477 52.1995 20.6498C52.1995 20.7791 52.203 20.9067 52.21 21.0325C52.2832 22.5886 52.8071 24.0898 53.7178 25.3537C54.6286 26.6175 55.887 27.5894 57.34 28.1513C58.7929 28.7131 60.3778 28.8406 61.9019 28.5182C63.426 28.1959 64.8236 27.4376 65.9247 26.3356L63.4697 23.8789C63.0463 24.3041 62.5431 24.6416 61.989 24.8719C61.4349 25.1022 60.8407 25.2207 60.2406 25.2208M57.0099 17.4173C57.4832 16.9435 58.055 16.5796 58.6847 16.3515C59.3144 16.1234 59.9866 16.0366 60.6535 16.0973C61.3205 16.158 61.966 16.3647 62.5442 16.7027C63.1223 17.0408 63.6191 17.5018 63.9991 18.0533L58.9319 19.3358L55.7029 20.1518C55.816 19.1174 56.279 18.1527 57.0151 17.4173"
+                    fill="#10069F"></path>
+                <path
+                    d="M81.3168 22.8461L84.3606 24.5183C83.5026 26.0841 82.1476 27.3197 80.5094 28.03C78.8713 28.7403 77.0432 28.8849 75.3138 28.441C73.5843 27.9971 72.0519 26.99 70.9583 25.5786C69.8647 24.1672 69.2722 22.4318 69.2743 20.6463C69.2746 20.3198 69.2944 19.9936 69.3337 19.6695C69.4566 18.6528 69.774 17.6693 70.2685 16.7725C70.385 16.5546 70.516 16.3415 70.6617 16.1329C71.4337 14.9931 72.4856 14.0706 73.7165 13.454C74.9474 12.8373 76.3161 12.5472 77.6913 12.6114C79.0666 12.6756 80.4022 13.092 81.5704 13.8206C82.7385 14.5492 83.6999 15.5656 84.3624 16.7725L81.3186 18.4464C80.9251 17.7284 80.3458 17.1294 79.6414 16.7122C78.937 16.2949 78.1333 16.0748 77.3146 16.0748C76.4958 16.0748 75.6922 16.2949 74.9877 16.7122C74.2833 17.1294 73.704 17.7284 73.3106 18.4464C73.2636 18.5279 73.221 18.6119 73.183 18.698C72.8929 19.3064 72.7436 19.9723 72.7462 20.6463C72.7454 21.6607 73.0823 22.6465 73.7037 23.4482C74.3252 24.2499 75.1958 24.822 76.1784 25.0741C77.1609 25.3263 78.1994 25.2442 79.1302 24.8408C80.0609 24.4373 80.8308 23.7356 81.3186 22.8461"
+                    fill="#10069F"></path>
+                <path d="M132.98 12.8375H128.453V28.4533H132.98V12.8375Z" fill="#10069F"></path>
+                <path
+                    d="M132.982 6.28162C131.781 6.28162 130.629 6.7586 129.78 7.60763C128.931 8.45667 128.454 9.60821 128.454 10.8089H132.983L132.982 6.28162Z"
+                    fill="#FA4C03"></path>
+                <defs>
+                    <linearGradient id="paint0_linear_351_2682_foot" x1="6.64824" y1="16.9224" x2="16.0841" y2="26.3583"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#DA2922"></stop>
+                        <stop offset="1" stop-color="#FA4C03"></stop>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <div class="text-center text-sm font-medium text-muted lg:text-right">
                 &copy; 2026 Rectoriam Inc. Registered and operating under Canadian Jurisdiction.
             </div>
         </div>
     </footer>
 
+    <script>
+        // Scroll reveal via IntersectionObserver. Elements stay visible once shown.
+        (function () {
+            var nodes = document.querySelectorAll('[data-reveal]');
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (reduce || !('IntersectionObserver' in window)) {
+                nodes.forEach(function (n) {
+                    n.classList.add('is-in');
+                });
+                return;
+            }
+
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: '0px 0px -80px 0px',
+                threshold: 0
+            });
+
+            nodes.forEach(function (n) {
+                io.observe(n);
+            });
+        })();
+
+        // Mobile navigation panel.
+        (function () {
+            var btn = document.getElementById('navToggle');
+            var panel = document.getElementById('navPanel');
+            if (!btn || !panel) return;
+
+            btn.addEventListener('click', function () {
+                var open = panel.hasAttribute('hidden');
+                if (open) {
+                    panel.removeAttribute('hidden');
+                } else {
+                    panel.setAttribute('hidden', '');
+                }
+                btn.setAttribute('aria-expanded', String(open));
+                btn.querySelector('i').className = 'ph i text-xl ' + (open ? 'ph-x' : 'ph-list');
+            });
+        })();
+    </script>
 </body>
+
 </html>
